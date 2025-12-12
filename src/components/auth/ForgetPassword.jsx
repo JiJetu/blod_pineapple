@@ -15,7 +15,7 @@ const ForgetPassword = ({ onNext }) => {
 
   return (
     <AuthLayout>
-      <div className="w-full md:w-1/2 py-8 px-14 flex flex-col">
+      <div className="w-full md:w-1/2 py-8 px-14 flex flex-col roboto">
         <img src={IMAGES.logo} alt="Logo" className="w-20 h-20 rounded-full mb-4" />
         <h2 className="text-3xl font-semibold text-primary mb-2">Forget Password</h2>
         <p className="text-primary mb-6">Please enter your email</p>
