@@ -38,10 +38,10 @@ const DashboardLayout = () => {
       >
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className={`absolute p-1 ${
+          className={`absolute text-white p-1 ${
             collapsed
-              ? "top-[76px] right-[-1.75rem] text-black"
-              : "top-[87px] right-[0.75rem] text-white"
+              ? "top-[5.35rem] right-[0.50rem]"
+              : "top-[87px] right-[0.75rem]"
           }`}
         >
           {collapsed ? (
