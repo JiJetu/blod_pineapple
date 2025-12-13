@@ -4,12 +4,12 @@ import { IoNotifications } from "react-icons/io5";
 const DashboardHeader = ({ title, description }) => {
 
   return (
-    <div className="flex items-center border-b border-b-[#0000001A] justify-between py-4 px-2 lg:p-4 bg-white dark:bg-white text-[#020202] outfit ">
+    <div className="flex items-center border-b border-b-[#0000001A] justify-between py-4 px-2 lg:p-4 bg-white dark:bg-white text-[#020202] outfit">
       {/* Title */}
 
-      <div>
+      <div className="pl-14 lg:pl-4 roboto">
         {title && (
-          <h1 className="text-2xl font-semibold text-primary">{title}</h1>
+          <h1 className="text-lg lg:text-2xl font-semibold text-primary">{title}</h1>
         )}
         {description && (
           <div className="text-base text-black">{description}</div>

@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "../page/auth/Login";
 import ForgotPasswordFlow from "../page/auth/ForgotPasswordFlow";
 import DashboardLayout from "../layout/dashboard/DashboardLayout";
+import Dashboard from "../components/dashboard/Dashboard";
 
 const router = createBrowserRouter([
   {
@@ -16,7 +17,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <p>Dashboard Home</p>,
+        element: <Dashboard />,
       },
     ],
   },
