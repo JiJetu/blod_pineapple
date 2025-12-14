@@ -16,7 +16,7 @@ const DashboardSidebar = ({ collapsed = false }) => {
 
   const menuItems = [
     { to: "/dashboard", icon: MdDashboard, label: "Dashboard" },
-    { to: "/dashboard/student", icon: PiStudentBold, label: "Student" },
+    { to: "/dashboard/students", icon: PiStudentBold, label: "Student" },
     { to: "/dashboard/award-assign", icon: FaGraduationCap, label: "Award Assign" },
     { to: "/dashboard/certificate", icon: PiCertificateLight , label: "Certificate" },
     { to: "/dashboard/faction", icon: FaPeopleGroup, label: "Faction" },

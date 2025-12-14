@@ -4,7 +4,7 @@ import { IoNotifications } from "react-icons/io5";
 const DashboardHeader = ({ title, description }) => {
 
   return (
-    <div className="flex items-center border-b border-b-[#0000001A] justify-between py-4 px-2 lg:p-4 bg-white dark:bg-white text-[#020202] outfit">
+    <div className="flex items-center justify-between py-4 px-2 lg:p-4 bg-[#fbf9f7] dark:bg-[#fbf9f7] text-[#020202] outfit">
       {/* Title */}
 
       <div className="pl-14 lg:pl-4 roboto">

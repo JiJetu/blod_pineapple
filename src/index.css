@@ -13,3 +13,19 @@
 .rocknroll {
   font-family: "RocknRoll One", sans-serif;
 }
+
+
+.custom-reusable-modal .ant-modal-content {
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.custom-reusable-modal .ant-modal-header {
+  display: none; /* We use custom title instead */
+}
+
+.custom-reusable-modal .ant-modal-close {
+  top: 20px;
+  right: 24px;
+}
