@@ -7,6 +7,7 @@ import StudentManagement from "../page/dashboard/StudentManagement";
 import AwardAssignment from "../page/dashboard/AwardAssignment";
 import CertificateGeneration from "../page/dashboard/CertificateGeneration";
 import Faction from "../page/dashboard/Faction";
+import Report from "../page/dashboard/Report";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: "faction",
         element: <Faction />,
+      },
+      {
+        path: "report",
+        element: <Report />,
       },
     ],
   },

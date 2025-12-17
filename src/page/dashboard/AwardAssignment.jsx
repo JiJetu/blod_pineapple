@@ -62,7 +62,7 @@ const AwardAssignment = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 roboto">
       {/* Award Rule Section */}
       <div className="bg-white rounded-xl shadow-md p-8 mb-8 border-2 border-[#777777">
         <h2 className="text-2xl font-bold text-center text-[#5F0629] mb-6">

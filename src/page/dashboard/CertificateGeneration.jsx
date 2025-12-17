@@ -117,7 +117,7 @@ const CertificateGeneration = () => {
   const totalCertificatesAllTime = 2448; // static or from API
 
   return (
-    <div className="bg-[#fbf9f7] min-h-screen p-6">
+    <div className="bg-[#fbf9f7] min-h-screen p-6 roboto">
       <div>
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

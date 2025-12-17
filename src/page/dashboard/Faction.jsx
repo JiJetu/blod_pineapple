@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Select } from "antd";
 import { ICONS } from "../../assets";
+import { useHeader } from "../../contexts/HeaderContext";
 
 const { Option } = Select;
 
@@ -70,6 +71,7 @@ const years = ["2023", "2024", "2025", "2026"];
 const Faction = () => {
   const [selectedYear, setSelectedYear] = useState("2025");
   const factionData = getFactionData(selectedYear);
+  const { setTitle, setDescription } = useHeader();
 
   // Merge static config with dynamic data
   const factions = FACTION_CONFIG.map((config) => ({
@@ -79,6 +81,11 @@ const Faction = () => {
 
   // Calculate max total for progress bar scaling
   const maxTotal = Math.max(...factions.map((f) => f.totalAward));
+
+  useEffect(() => {
+    setTitle("Faction Module");
+    setDescription("View faction performance & leaderboard");
+  }, [setTitle, setDescription]);
 
   return (
     <div className="bg-[#fbf9f7] min-h-screen p-6 roboto">
@@ -201,7 +208,9 @@ const Faction = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total Award</span>
-                    <span className="font-bold text-base">{faction.totalAward}</span>
+                    <span className="font-bold text-base">
+                      {faction.totalAward}
+                    </span>
                   </div>
 
                   <hr className="my-4 border-gray-200" />
