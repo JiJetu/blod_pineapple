@@ -5,7 +5,7 @@ import { FaGraduationCap } from "react-icons/fa";
 import { PiCertificateLight } from "react-icons/pi";
 import { FaPeopleGroup } from "react-icons/fa6";
 import { HiOutlineDocumentReport } from "react-icons/hi";
-import { BsArchive } from "react-icons/bs";
+import { HiArchiveBoxArrowDown } from "react-icons/hi2";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdDashboard } from "react-icons/md";
 import { IMAGES } from "../../assets";
@@ -21,7 +21,7 @@ const DashboardSidebar = ({ collapsed = false }) => {
     { to: "/dashboard/certificate", icon: PiCertificateLight , label: "Certificate" },
     { to: "/dashboard/faction", icon: FaPeopleGroup, label: "Faction" },
     { to: "/dashboard/report", icon: HiOutlineDocumentReport, label: "Report" },
-    { to: "/dashboard/archive", icon: BsArchive, label: "Archive" },
+    { to: "/dashboard/archive", icon: HiArchiveBoxArrowDown, label: "Archive" },
     { to: "/dashboard/settings", icon: IoSettingsOutline, label: "Settings" },
   ];
 

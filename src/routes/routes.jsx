@@ -8,6 +8,9 @@ import AwardAssignment from "../page/dashboard/AwardAssignment";
 import CertificateGeneration from "../page/dashboard/CertificateGeneration";
 import Faction from "../page/dashboard/Faction";
 import Report from "../page/dashboard/Report";
+import Archive from "../page/dashboard/Archive";
+import Site from "../page/dashboard/Site";
+import ChangePassword from "../page/dashboard/ChangePassword";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +47,18 @@ const router = createBrowserRouter([
         path: "report",
         element: <Report />,
       },
+      {
+        path: "archive",
+        element: <Archive />,
+      },
+      {
+        path: "settings",
+        element: <ChangePassword />,
+      },
+      // {
+      //   path: "settings",
+      //   element: <Site />,
+      // },
     ],
   },
 ]);

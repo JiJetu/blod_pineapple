@@ -189,8 +189,8 @@ const Report = () => {
             onClick={() => setActiveTab("faction")}
             className={`flex-1 py-0 px-8 rounded-full text-lg font-semibold transition-all ${
               activeTab === "faction"
-                ? "bg-[#5F0629] text-white shadow-md"
-                : "text-gray-600"
+                ? "bg-primary text-white shadow-md"
+                : "text-primary"
             }`}
           >
             Faction
@@ -199,8 +199,8 @@ const Report = () => {
             onClick={() => setActiveTab("year")}
             className={`flex-1 py-0 px-8 rounded-full text-lg font-semibold transition-all ${
               activeTab === "year"
-                ? "bg-[#5F0629] text-white shadow-md"
-                : "text-gray-600"
+                ? "bg-primary text-white shadow-md"
+                : "text-primary"
             }`}
           >
             Year
