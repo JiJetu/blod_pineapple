@@ -20,10 +20,10 @@ const DashboardHeader = ({ title, description }) => {
         {/* Notification Icon */}
         <NavLink to="/">
           <div className="relative cursor-pointer">
-            <IoNotifications className="size-10 text-primary" />
+            <IoNotifications className="size-5 md:size-10 text-primary" />
 
             {/* bell small dot indicator */}
-            <span className="absolute top-[2px] right-[5px] size-4 rounded-full bg-[#FF0C0C]"></span>
+            <span className="absolute top-[2px] right-[5px] size-1 md:size-4 rounded-full bg-[#FF0C0C]"></span>
           </div>
         </NavLink>
 
@@ -31,7 +31,7 @@ const DashboardHeader = ({ title, description }) => {
         <div className="flex items-center gap-6 cursor-pointer">
           {/* Time + Date */}
           <div className="flex flex-col leading-tight text-right">
-            <span className="text-lg font-medium text-black py-2 px-5 border border-primary rounded-lg">
+            <span className="md:text-lg font-medium text-black py-2 px-5 border border-primary rounded-lg">
               Admin
             </span>
           </div>

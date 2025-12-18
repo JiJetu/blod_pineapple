@@ -125,7 +125,7 @@ const ChangePassword = () => {
             <Button
               htmlType="submit"
               size="large"
-              className="px-16 text-xl font-semibold rounded-md shadow-lg"
+              className="px-16 text-lg font-semibold rounded-md shadow-lg"
               style={{
                 background: "#5F0629",
                 color: "white",

@@ -52,13 +52,13 @@ const router = createBrowserRouter([
         element: <Archive />,
       },
       {
-        path: "settings",
+        path: "settings/site",
+        element: <Site />,
+      },
+      {
+        path: "settings/account",
         element: <ChangePassword />,
       },
-      // {
-      //   path: "settings",
-      //   element: <Site />,
-      // },
     ],
   },
 ]);
