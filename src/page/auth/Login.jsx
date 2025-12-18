@@ -1,14 +1,17 @@
 import { useForm } from "react-hook-form";
 import { IMAGES } from "../../assets";
 import AuthLayout from "../../components/shared/auth/AuthLayout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 const Login = () => {
   const { register, handleSubmit } = useForm();
+  const navigate = useNavigate();
 
   const onSubmit = (data) => {
     console.log(data);
+
+    navigate("/dashboard");
   };
 
   return (
