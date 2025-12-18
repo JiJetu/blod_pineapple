@@ -11,6 +11,7 @@ import { IoSettingsOutline, IoChevronDown, IoChevronUp } from "react-icons/io5";
 import { MdDashboard } from "react-icons/md";
 import { IMAGES } from "../../assets";
 import { SiSitepoint } from "react-icons/si";
+import { IoMdLogOut } from "react-icons/io";
 
 const DashboardSidebar = ({ collapsed = false }) => {
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ const DashboardSidebar = ({ collapsed = false }) => {
   return (
     <div className="bg-[#5F0629] text-white min-h-screen flex flex-col justify-between py-6 pl-4">
       {/* Logo */}
-      <div className="mb-8 flex justify-start">
+      <div className="mb-12 flex justify-start">
         <Link to="/dashboard">
           <img
             src={IMAGES.logo}
@@ -173,15 +174,18 @@ const DashboardSidebar = ({ collapsed = false }) => {
       {/* Logout */}
       <div
         onClick={handleLogout}
-        className="flex items-center gap-4 px-5 py-4 rounded-lg cursor-pointer hover:bg-white/10 transition-all mt-8 border-t border-white/20 pt-6"
+        className="flex items-center justify-center gap-4 py-4 rounded-lg cursor-pointer hover:bg-white/10 transition-all mt-8 border-t border-white/20 pt-6"
       >
-        <div className="p-2 rounded-lg bg-red-600/20 text-red-400">
-          <FaSignOutAlt className="w-6 h-6" />
+        <div className="border border-[#FF0C0C] flex justify-center items-center gap-2 p-2 rounded-md">
+          <div className="rounded-lg text-[#FF0C0C]">
+          <IoMdLogOut className="w-6 h-6" />
         </div>
         {!collapsed && (
-          <span className="text-lg font-medium text-red-400">Logout</span>
+          <span className="text-lg font-medium text-white">Logout</span>
         )}
       </div>
+        </div>
+        
     </div>
   );
 };

@@ -220,7 +220,7 @@ const Archive = () => {
               <div className="px-6 py-4 flex items-center justify-between">
                 <button
                   onClick={() => handleRestore(student)}
-                  className="bg-primary text-white rounded-lg px-6 py-2 font-medium hover:bg-gray-50 flex items-center gap-2 shadow-sm"
+                  className="bg-primary text-white rounded-lg px-6 py-2 font-medium flex items-center gap-2 shadow-sm"
                 >
                   <TbRestore className="text-xl" />
                   Restore
@@ -228,7 +228,7 @@ const Archive = () => {
 
                 <BsFillTrashFill
                   onClick={() => handleDelete(student)}
-                  className="text-2xl text-primary cursor-pointer hover:opacity-80"
+                  className="text-2xl text-primary cursor-pointer"
                 />
               </div>
             </div>

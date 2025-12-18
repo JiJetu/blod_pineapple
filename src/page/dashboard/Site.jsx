@@ -25,7 +25,6 @@ const Site = () => {
     { name: "Gold Medallion", imageUrl: null, number: "", relative: "" },
     { name: "Andrew Stuart Merit Award", imageUrl: null, number: "", relative: "" }
   ]);
-
   const [years, setYears] = useState(["Primary", "Kindergarten", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6"]);
   const [factions, setFactions] = useState([
     { name: "Bilbies", imageUrl: null },
@@ -66,7 +65,6 @@ const Site = () => {
         break;
     }
     console.log(`Delete ${tab}:`, itemName);
-    // TODO: API call later
   };
 
   const handleCreate = () => {
@@ -128,15 +126,15 @@ const Site = () => {
   }[activeTab];
 
   return (
-    <div className="bg-[#fbf9f7] min-h-screen p-6 roboto">
-      <div>
+    <div className="bg-[#fbf9f7] min-h-screen p-4 sm:p-6 roboto">
+      <div className="max-w-7xl mx-auto">
         {/* Pill Tabs */}
-        <div className="flex bg-gray-100 rounded-full p-1 mb-10 shadow-sm">
+        <div className="flex flex-wrap bg-gray-100 rounded-full p-1 mb-8 shadow-sm gap-1">
           {["Award", "Year", "Faction", "Room", "Quantity"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab.toLowerCase())}
-              className={`flex-1 py-1 px-6 rounded-full text-lg font-semibold transition-all ${
+              className={`flex-1 min-w-[80px] py-2 px-3 text-sm sm:text-lg font-semibold rounded-full transition-all ${
                 activeTab === tab.toLowerCase()
                   ? "bg-[#5F0629] text-white shadow-md"
                   : "text-gray-600"
@@ -148,8 +146,8 @@ const Site = () => {
         </div>
 
         {/* Create Form Card */}
-        <div className="bg-white rounded-2xl shadow-md p-10 mb-10">
-          <h2 className="text-2xl font-bold text-gray-800 mb-8">
+        <div className="bg-white rounded-2xl shadow-md p-6 sm:p-10 mb-10">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6 sm:mb-8">
             {activeTab === "award" && "Award Create"}
             {activeTab === "year" && "Year Create"}
             {activeTab === "faction" && "Add new faction"}
@@ -157,32 +155,50 @@ const Site = () => {
             {activeTab === "quantity" && "Add Quantity"}
           </h2>
 
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {activeTab === "award" && (
               <>
                 <div>
-                  <label className="text-gray-700 font-medium mb-2 block">Name</label>
-                  <Input placeholder="Name of award" className="h-12 rounded-lg" value={awardName} onChange={(e) => setAwardName(e.target.value)} />
+                  <label className="text-gray-700 font-medium mb-2 block text-sm sm:text-base">Name</label>
+                  <Input
+                    placeholder="Name of award"
+                    className="h-11 sm:h-12 rounded-lg text-sm sm:text-base"
+                    value={awardName}
+                    onChange={(e) => setAwardName(e.target.value)}
+                  />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                   <div>
-                    <label className="text-gray-700 font-medium mb-2 block">Number</label>
-                    <Select placeholder="Select number" className="h-12 w-full" value={awardNumber} onChange={setAwardNumber}
-                      options={quantities.map(q => ({ value: q, label: q }))} />
+                    <label className="text-gray-700 font-medium mb-2 block text-sm sm:text-base">Number</label>
+                    <Select
+                      placeholder="Select number"
+                      className="h-11 sm:h-12 w-full"
+                      value={awardNumber}
+                      onChange={setAwardNumber}
+                      options={quantities.map(q => ({ value: q, label: q }))}
+                    />
                   </div>
                   <div>
-                    <label className="text-gray-700 font-medium mb-2 block">Relative award</label>
-                    <Select placeholder="List of award" className="h-12 w-full" value={relativeAward} onChange={setRelativeAward}
-                      options={awards.map(a => ({ value: a.name, label: a.name }))} />
+                    <label className="text-gray-700 font-medium mb-2 block text-sm sm:text-base">Relative award</label>
+                    <Select
+                      placeholder="List of award"
+                      className="h-11 sm:h-12 w-full"
+                      value={relativeAward}
+                      onChange={setRelativeAward}
+                      options={awards.map(a => ({ value: a.name, label: a.name }))}
+                    />
                   </div>
                 </div>
                 <div>
-                  <label className="text-gray-700 font-medium mb-4 block">Add award Icon</label>
+                  <label className="text-gray-700 font-medium mb-4 block text-sm sm:text-base">Add award Icon</label>
                   <Upload.Dragger {...uploadProps} className="bg-[#f0f8ff]">
-                    <div className="py-10 text-center">
-                      <p className="text-xl font-medium text-gray-700 mb-4">Drag & drop here</p>
-                      <p className="text-xl text-gray-500 mb-8">or</p>
-                      <Button style={{ color: "#5F0629", borderColor: "#5F0629" }} className="px-8 text-lg rounded-lg">
+                    <div className="py-8 sm:py-10 text-center">
+                      <p className="text-lg sm:text-xl font-medium text-gray-700 mb-3">Drag & drop here</p>
+                      <p className="text-base sm:text-xl text-gray-500 mb-6 sm:mb-8">or</p>
+                      <Button
+                        style={{ color: "#5F0629", borderColor: "#5F0629" }}
+                        className="px-6 sm:px-8 text-base sm:text-lg rounded-lg"
+                      >
                         Browse here
                       </Button>
                     </div>
@@ -193,7 +209,7 @@ const Site = () => {
 
             {(activeTab === "year" || activeTab === "room" || activeTab === "quantity") && (
               <div>
-                <label className="text-gray-700 font-medium mb-2 block">
+                <label className="text-gray-700 font-medium mb-2 block text-sm sm:text-base">
                   {activeTab === "year" ? "Year" : activeTab === "room" ? "Room" : "Quantity"}
                 </label>
                 <Input
@@ -202,7 +218,7 @@ const Site = () => {
                     activeTab === "room" ? "Enter room number" :
                     "Enter quantity"
                   }
-                  className="h-12 rounded-lg"
+                  className="h-11 sm:h-12 rounded-lg text-sm sm:text-base"
                   value={activeTab === "year" ? yearValue : activeTab === "room" ? roomValue : quantityValue}
                   onChange={(e) => {
                     if (activeTab === "year") setYearValue(e.target.value);
@@ -216,16 +232,24 @@ const Site = () => {
             {activeTab === "faction" && (
               <>
                 <div>
-                  <label className="text-gray-700 font-medium mb-2 block">Name</label>
-                  <Input placeholder="Enter faction name" className="h-12 rounded-lg" value={factionName} onChange={(e) => setFactionName(e.target.value)} />
+                  <label className="text-gray-700 font-medium mb-2 block text-sm sm:text-base">Name</label>
+                  <Input
+                    placeholder="Enter faction name"
+                    className="h-11 sm:h-12 rounded-lg text-sm sm:text-base"
+                    value={factionName}
+                    onChange={(e) => setFactionName(e.target.value)}
+                  />
                 </div>
                 <div>
-                  <label className="text-gray-700 font-medium mb-4 block">Add faction Logo</label>
+                  <label className="text-gray-700 font-medium mb-4 block text-sm sm:text-base">Add faction Logo</label>
                   <Upload.Dragger {...uploadProps} className="bg-[#f0f8ff]">
-                    <div className="py-16 text-center">
-                      <p className="text-2xl font-medium text-gray-700 mb-4">Drag & drop here</p>
-                      <p className="text-xl text-gray-500 mb-8">or</p>
-                      <Button className="h-12 px-12 text-lg rounded-lg" style={{ borderColor: "#5F0629", color: "#5F0629" }}>
+                    <div className="py-10 sm:py-16 text-center">
+                      <p className="text-xl sm:text-2xl font-medium text-gray-700 mb-4">Drag & drop here</p>
+                      <p className="text-base sm:text-xl text-gray-500 mb-6 sm:mb-8">or</p>
+                      <Button
+                        className="h-11 sm:h-12 px-8 sm:px-12 text-base sm:text-lg rounded-lg"
+                        style={{ borderColor: "#5F0629", color: "#5F0629" }}
+                      >
                         Browse here
                       </Button>
                     </div>
@@ -235,9 +259,9 @@ const Site = () => {
             )}
           </div>
 
-          <div className="text-right mt-12">
+          <div className="text-right mt-10">
             <Button
-              className="py-4 px-16 text-xl font-semibold rounded-md shadow-lg"
+              className="w-full sm:w-auto py-3 sm:py-4 px-12 sm:px-16 text-lg sm:text-xl font-semibold rounded-md shadow-lg"
               style={{ background: "#5F0629", color: "white" }}
               onClick={handleCreate}
             >
@@ -246,9 +270,9 @@ const Site = () => {
           </div>
         </div>
 
-        {/* List Card - Now matches the design perfectly */}
-        <div className="bg-white rounded-2xl shadow-md p-10">
-          <h2 className="text-xl font-bold text-gray-800 mb-8">
+        {/* List Card */}
+        <div className="bg-white rounded-2xl shadow-md p-6 sm:p-10">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-6 sm:mb-8">
             {activeTab === "award" && "Award list"}
             {activeTab === "year" && "Year list"}
             {activeTab === "faction" && "Faction list"}
@@ -256,7 +280,7 @@ const Site = () => {
             {activeTab === "quantity" && "Quantity list"}
           </h2>
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4">
             {currentList.map((item, index) => {
               const displayName = typeof item === "string" ? item : item.name;
               const imageUrl = typeof item === "string" ? null : item.imageUrl;
@@ -264,23 +288,23 @@ const Site = () => {
               return (
                 <div
                   key={index}
-                  className="flex items-center justify-between bg-[#e6f7ff] rounded-full px-5 py-3 shadow-sm hover:shadow transition-shadow min-w-[120px]"
+                  className="flex items-center justify-between bg-[#e6f7ff] rounded-full px-4 sm:px-5 py-2.5 sm:py-3 shadow-sm hover:shadow transition-shadow min-w-[100px] sm:min-w-[120px]"
                 >
-                  <span className="text-lg font-medium text-gray-800 flex items-center gap-3">
+                  <span className="text-sm sm:text-lg font-medium text-gray-800 flex items-center gap-2 sm:gap-3">
                     {imageUrl && (
                       <img
                         src={imageUrl}
                         alt={displayName}
-                        className="w-7 h-7 rounded-full object-cover border border-gray-300"
+                        className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-gray-300"
                       />
                     )}
                     {displayName}
                   </span>
                   <button
                     onClick={() => handleDelete(item, activeTab)}
-                    className="ml-4 text-red-500 hover:text-red-700 transition-colors"
+                    className="ml-3 sm:ml-4 text-red-500 hover:text-red-700 transition-colors"
                   >
-                    <MinusCircleOutlined className="text-2xl" />
+                    <MinusCircleOutlined className="text-xl sm:text-2xl" />
                   </button>
                 </div>
               );

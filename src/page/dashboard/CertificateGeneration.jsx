@@ -91,9 +91,9 @@ const CertificateGeneration = () => {
   const { setTitle, setDescription } = useHeader();
 
   useEffect(() => {
-      setTitle("Certificate Generation");
-      setDescription("Generate & print certificate for eligible students");
-    }, [setTitle, setDescription]);
+    setTitle("Certificate Generation");
+    setDescription("Generate & print certificate for eligible students");
+  }, [setTitle, setDescription]);
 
   // Toggle individual student selection
   const toggleStudent = (studentId) => {
@@ -219,11 +219,24 @@ const CertificateGeneration = () => {
 
           <Button
             type="primary"
-            icon={<DownloadOutlined />}
+            icon={
+              <DownloadOutlined
+                style={{
+                  color: selectedStudents.length === 0 ? "rgba(255, 255, 255, 0.65)" : "#ffffff",
+                }}
+              />
+            }
             size="large"
-            className="h-11 px-6 rounded-lg"
-            style={{ background: "#5F0629" }}
             disabled={selectedStudents.length === 0}
+            style={{
+              height: 44,
+              paddingInline: 24,
+              borderRadius: 8,
+              backgroundColor: selectedStudents.length === 0 ? "rgba(95, 6, 41, 0.5)" : "#5F0629",
+              color: selectedStudents.length === 0 ? "rgba(255, 255, 255, 0.65)" : "#ffffff",
+              cursor: selectedStudents.length === 0 ? "not-allowed" : "pointer",
+              border: "none",
+            }}
           >
             Download list
           </Button>
