@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { FaSignOutAlt, FaUserShield } from "react-icons/fa";
+import { FaUserShield } from "react-icons/fa";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { PiStudentBold } from "react-icons/pi";
 import { FaGraduationCap } from "react-icons/fa";
@@ -11,7 +11,7 @@ import { IoSettingsOutline, IoChevronDown, IoChevronUp } from "react-icons/io5";
 import { MdDashboard } from "react-icons/md";
 import { IMAGES } from "../../assets";
 import { SiSitepoint } from "react-icons/si";
-import { IoMdLogOut } from "react-icons/io";
+import { AiOutlineLogout } from "react-icons/ai";
 
 const DashboardSidebar = ({ collapsed = false }) => {
   const navigate = useNavigate();
@@ -178,7 +178,7 @@ const DashboardSidebar = ({ collapsed = false }) => {
       >
         <div className="border border-[#FF0C0C] flex justify-center items-center gap-2 p-2 rounded-md">
           <div className="rounded-lg text-[#FF0C0C]">
-          <IoMdLogOut className="w-6 h-6" />
+          <AiOutlineLogout className="w-6 h-6" />
         </div>
         {!collapsed && (
           <span className="text-lg font-medium text-white">Logout</span>

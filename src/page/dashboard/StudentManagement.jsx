@@ -162,7 +162,7 @@ const StudentManagement = () => {
   };
 
   return (
-    <div className="bg-[#fbf9f7] px-6">
+    <div className="bg-[#fbf9f7] px-6 roboto">
       {/* Filter & Search */}
       <div className="bg-white p-4 rounded-md shadow-md">
         <div className="flex items-center justify-between mb-4">

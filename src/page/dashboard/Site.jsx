@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Input, Select, Upload, Button, message } from "antd";
 import { MinusCircleOutlined } from "@ant-design/icons";
 import { useHeader } from "../../contexts/HeaderContext";
