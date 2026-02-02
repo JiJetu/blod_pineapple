@@ -1,24 +1,20 @@
-import React from "react";
-import { Form, Input, Select, Button } from "antd";
+import { Form, Input, Select, Button, message } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import ReusableModal from "../shared/modal/Modal";
+import { useCreateStudentMutation } from "../../redux/student/student.api";
+import { useGetYearsQuery } from "../../redux/features/years/years.api";
+import { useGetFactionsQuery } from "../../redux/features/factions/factions.api";
+import { useGetRoomsQuery } from "../../redux/features/rooms/rooms.api";
+
 
 const { Option } = Select;
 
-const yearOptions = [
-  "Kindergarten",
-  "Primary",
-  "Year 1",
-  "Year 2",
-  "Year 3",
-  "Year 4",
-  "Year 5",
-  "Year 6",
-];
-const factionOptions = ["Bilbies", "Bandicoots", "Wallabies", "Numbats"];
-const roomOptions = ["EC 3", "EC 4", "Room 1", "Room 2"];
-
 const AddStudentModal = ({ open, onCancel, onSubmit }) => {
+  const [createStudent, { isLoading }] = useCreateStudentMutation();
+  const { data: years = [] } = useGetYearsQuery();
+  const { data: factions = [] } = useGetFactionsQuery();
+  const { data: rooms = [] } = useGetRoomsQuery();
+
   const {
     control,
     handleSubmit,
@@ -26,18 +22,44 @@ const AddStudentModal = ({ open, onCancel, onSubmit }) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      firstName: "",
+      first_name: "",
       surname: "",
-      studentId: "",
+      student_id: "",
       year: "",
       faction: "",
       room: "",
     },
   });
 
-  const onSubmitForm = (data) => {
-    onSubmit(data);
-    reset();
+  const onSubmitForm = async (data) => {
+    try {
+      const formattedData = {
+        first_name: data.first_name,
+        surname: data.surname,
+        student_id: data.student_id,
+        year: data.year,
+        faction: data.faction,
+        room: data.room,
+      };
+
+      const response = await createStudent(formattedData).unwrap();
+      message.success("Student created successfully!");
+      reset();
+      onSubmit(response); // Call parent onSubmit if needed
+    } catch (error) {
+      console.error("Create student error:", error);
+      if (error.data) {
+        if (error.data.non_field_errors) {
+          message.error(error.data.non_field_errors.join(", "));
+        } else if (error.data.student_id) {
+          message.error(`Student ID: ${error.data.student_id.join(", ")}`);
+        } else {
+          message.error("Failed to create student. Please check your inputs.");
+        }
+      } else {
+        message.error("Network error. Please try again.");
+      }
+    }
   };
 
   const handleCancel = () => {
@@ -57,7 +79,7 @@ const AddStudentModal = ({ open, onCancel, onSubmit }) => {
           {/* First Name */}
           <Form.Item label="First Name" required>
             <Controller
-              name="firstName"
+              name="first_name"
               control={control}
               rules={{ required: "First name is required" }}
               render={({ field }) => (
@@ -84,9 +106,9 @@ const AddStudentModal = ({ open, onCancel, onSubmit }) => {
                 />
               )}
             />
-            {errors.firstName && (
+            {errors.first_name && (
               <span className="text-red-500 text-sm">
-                {errors.firstName.message}
+                {errors.first_name.message}
               </span>
             )}
           </Form.Item>
@@ -128,24 +150,23 @@ const AddStudentModal = ({ open, onCancel, onSubmit }) => {
             )}
           </Form.Item>
 
-          {/* ID */}
-          <Form.Item label="ID" required>
+          {/* Student ID */}
+          <Form.Item label="Student ID" required>
             <Controller
-              name="studentId"
+              name="student_id"
               control={control}
               rules={{ required: "Student ID is required" }}
               render={({ field }) => (
                 <Input
                   {...field}
-                  prefix={<span className="text-gray-500">📄</span>}
                   placeholder="Enter student ID"
                   className="h-11 rounded-lg"
                 />
               )}
             />
-            {errors.studentId && (
+            {errors.student_id && (
               <span className="text-red-500 text-sm">
-                {errors.studentId.message}
+                {errors.student_id.message}
               </span>
             )}
           </Form.Item>
@@ -157,10 +178,10 @@ const AddStudentModal = ({ open, onCancel, onSubmit }) => {
               control={control}
               rules={{ required: "Year is required" }}
               render={({ field }) => (
-                <Select {...field} placeholder="Year" className="h-11">
-                  {yearOptions.map((y) => (
-                    <Option key={y} value={y}>
-                      {y}
+                <Select {...field} placeholder="Select year" className="h-11">
+                  {years.map((year) => (
+                    <Option key={year.id} value={year.id}>
+                      {year.name}
                     </Option>
                   ))}
                 </Select>
@@ -185,9 +206,9 @@ const AddStudentModal = ({ open, onCancel, onSubmit }) => {
                   placeholder="Select faction"
                   className="h-11"
                 >
-                  {factionOptions.map((f) => (
-                    <Option key={f} value={f}>
-                      {f}
+                  {factions.map((faction) => (
+                    <Option key={faction.id} value={faction.id}>
+                      {faction.name}
                     </Option>
                   ))}
                 </Select>
@@ -207,10 +228,10 @@ const AddStudentModal = ({ open, onCancel, onSubmit }) => {
               control={control}
               rules={{ required: "Room is required" }}
               render={({ field }) => (
-                <Select {...field} placeholder="Select Room" className="h-11">
-                  {roomOptions.map((r) => (
-                    <Option key={r} value={r}>
-                      {r}
+                <Select {...field} placeholder="Select room" className="h-11">
+                  {rooms.map((room) => (
+                    <Option key={room.id} value={room.id}>
+                      {room.name}
                     </Option>
                   ))}
                 </Select>
@@ -237,6 +258,7 @@ const AddStudentModal = ({ open, onCancel, onSubmit }) => {
             htmlType="submit"
             className="px-6 py-1 rounded-lg"
             style={{ background: "#5F0629" }}
+            loading={isLoading}
           >
             Add student
           </Button>

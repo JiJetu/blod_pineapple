@@ -2,6 +2,8 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import AuthLayout from "../shared/auth/AuthLayout";
 import { IMAGES } from "../../assets";
+import { useVerifyOtpMutation } from "../../redux/features/auth/auth.api";
+import { toast } from "sonner";
 
 
 
@@ -9,6 +11,7 @@ const OtpVerification = ({ email, onNext }) => {
   const { handleSubmit } = useForm();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
+  const [verifyOtp, { isLoading }] = useVerifyOtpMutation();
 
   const handleChange = (e, index) => {
     const value = e.target.value;
@@ -26,11 +29,18 @@ const OtpVerification = ({ email, onNext }) => {
     }
   };
 
-  const onSubmit = () => {
+  const onSubmit = async() => {
     const otpCode = otp.join("");
     console.log("Verifying OTP:", otpCode, "for", email);
-    // TODO: Call API to verify OTP
-    onNext(); // Proceed to next step
+    const toastId = toast.loading("Verifying OTP...");
+    try {
+      const response = await verifyOtp({ email, otp: otpCode }).unwrap();
+      toast.success("OTP verified successfully!", { id: toastId });
+      onNext(response.reset_token);
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.data?.detail || "OTP verification failed", { id: toastId });
+    }
   };
 
   const isComplete = otp.every(d => d !== "");
@@ -62,14 +72,14 @@ const OtpVerification = ({ email, onNext }) => {
 
           <button
             type="submit"
-            disabled={!isComplete}
+            disabled={!isComplete || isLoading}
             className={`w-full py-3 rounded-md text-white font-medium transition ${
               isComplete
                 ? "bg-primary hover:bg-primary-dark"
                 : "bg-gray-400 cursor-not-allowed"
             }`}
           >
-            Verify OTP
+            {isLoading ? "Verifying..." : "Verify OTP"}
           </button>
         </form>
 

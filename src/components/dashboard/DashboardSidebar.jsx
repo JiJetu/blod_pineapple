@@ -12,12 +12,16 @@ import { MdDashboard } from "react-icons/md";
 import { IMAGES } from "../../assets";
 import { SiSitepoint } from "react-icons/si";
 import { AiOutlineLogout } from "react-icons/ai";
+import { useDispatch } from "react-redux";
+import { persistor } from "../../redux/store";
+import { logout } from "../../redux/features/auth/auth.slice";
 
 const DashboardSidebar = ({ collapsed = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
+  const dispatch = useDispatch();
 
   const mainMenuItems = [
     { to: "/dashboard", icon: MdDashboard, label: "Dashboard" },
@@ -59,7 +63,11 @@ const DashboardSidebar = ({ collapsed = false }) => {
 }, [isSettingsOpen]);
 
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    dispatch(logout());
+
+    // Clear persisted storage (encrypted)
+    await persistor.purge();
     localStorage.removeItem("accessToken");
     navigate("/login", { replace: true });
   };

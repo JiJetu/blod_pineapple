@@ -1,16 +1,26 @@
 import { useForm } from "react-hook-form";
 import { IMAGES } from "../../assets";
 import AuthLayout from "../../components/shared/auth/AuthLayout";
+import { useSendOtpMutation } from "../../redux/features/auth/auth.api";
+import { toast } from "sonner";
 
 
 
 const ForgetPassword = ({ onNext }) => {
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const [sendOtp, { isLoading }] = useSendOtpMutation();
 
-  const onSubmit = (data) => {
+  const onSubmit = async(data) => {
     console.log("Sending OTP to:", data.email);
-    // TODO: Call API to send OTP
-    onNext(data.email); // Trigger next step
+    const toastId = toast.loading("Sending OTP...");
+    try {
+      await sendOtp({ email: data.email }).unwrap();
+      toast.success("OTP sent successfully!", { id: toastId });
+      onNext(data.email);
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.data?.detail || "Failed to send OTP", { id: toastId });
+    }
   };
 
   return (
@@ -42,9 +52,10 @@ const ForgetPassword = ({ onNext }) => {
 
           <button
             type="submit"
+            disabled={isLoading}
             className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary-dark transition-colors"
           >
-            Send OTP
+            {isLoading ? "Sending..." : "Send OTP"}
           </button>
         </form>
       </div>

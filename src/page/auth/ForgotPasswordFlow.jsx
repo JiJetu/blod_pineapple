@@ -8,7 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 const ForgotPasswordFlow = () => {
   const [step, setStep] = useState("email");
-  const [email, setEmail] = useState(""); // To pass email between steps if needed
+  const [email, setEmail] = useState("");
+  const [resetToken, setResetToken] = useState("");
   const navigate = useNavigate();
 
   const handleEmailSubmitted = (submittedEmail) => {
@@ -16,13 +17,12 @@ const ForgotPasswordFlow = () => {
     setStep("otp");
   };
 
-  const handleOtpVerified = () => {
+  const handleOtpVerified = (token) => {
+    setResetToken(token);
     setStep("newPassword");
   };
 
   const handlePasswordReset = () => {
-    // Final success action (e.g., redirect to login)
-    // alert("Password reset successfully!");
     navigate("/login")
   };
 
@@ -30,7 +30,7 @@ const ForgotPasswordFlow = () => {
     <>
       {step === "email" && <ForgetPassword onNext={handleEmailSubmitted} />}
       {step === "otp" && <OtpVerification email={email} onNext={handleOtpVerified} />}
-      {step === "newPassword" && <CreateNewPassword email={email} onSuccess={handlePasswordReset} />}
+      {step === "newPassword" && <CreateNewPassword email={email} resetToken={resetToken} onSuccess={handlePasswordReset} />}
     </>
   );
 };

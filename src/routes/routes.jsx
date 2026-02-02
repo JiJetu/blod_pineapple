@@ -11,6 +11,7 @@ import Report from "../page/dashboard/Report";
 import Archive from "../page/dashboard/Archive";
 import Site from "../page/dashboard/Site";
 import ChangePassword from "../page/dashboard/ChangePassword";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
   {
@@ -21,7 +22,7 @@ const router = createBrowserRouter([
   { path: "/forget-password", element: <ForgotPasswordFlow /> },
   {
     path: "/dashboard",
-    element: <DashboardLayout />,
+    element: <PrivateRoute><DashboardLayout /></PrivateRoute>,
     children: [
       {
         index: true,

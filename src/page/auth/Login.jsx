@@ -2,16 +2,39 @@ import { useForm } from "react-hook-form";
 import { IMAGES } from "../../assets";
 import AuthLayout from "../../components/shared/auth/AuthLayout";
 import { Link, useNavigate } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { useLoginMutation } from "../../redux/features/auth/auth.api";
 
 const Login = () => {
   const { register, handleSubmit } = useForm();
+  const [login, { isLoading, isError, error }] = useLoginMutation();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     console.log(data);
+    try {
+      await login(data).unwrap();
+      // const fakeResponse = {
+      //   token: "fake-jwt-access-token",
+      //   user: {
+      //     id: 1,
+      //     name: "John Doe",
+      //     email: data.email,
+      //   },
+      // };
 
-    navigate("/dashboard");
+      // dispatch(
+      //   setCredentials({
+      //     token: fakeResponse.token,
+      //     user: fakeResponse.user,
+      //   }),
+      // );
+
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
 
   return (
@@ -51,20 +74,32 @@ const Login = () => {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
+
+          {isError && (
+            <p className="text-red-500 text-sm mb-4">
+              {error?.data?.detail || "Invalid email or password"}
+            </p>
+          )}
+
           <div className="flex items-center justify-between mb-6">
             <label className="flex items-center text-gray-600">
               <input type="checkbox" className="mr-2" />
               Remember me
             </label>
-            <Link to="/forget-password" className="text-primary hover:underline">
+            <Link
+              to="/forget-password"
+              className="text-primary hover:underline"
+            >
               Forgot Password
             </Link>
           </div>
           <button
             type="submit"
+            
+            disabled={isLoading}
             className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary-dark transition-colors"
           >
-            Login
+             {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

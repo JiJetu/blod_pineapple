@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Form, Input, Button, message } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import { useHeader } from "../../contexts/HeaderContext";
+import { useChangePasswordMutation } from "../../redux/features/user/user.api";
 
 const labelStyle = {
   color: "#000",
@@ -13,6 +14,7 @@ const labelStyle = {
 
 const ChangePassword = () => {
   const { setTitle, setDescription } = useHeader();
+  const [changePassword, { isLoading }] = useChangePasswordMutation();
 
   const {
     control,
@@ -31,10 +33,25 @@ const ChangePassword = () => {
 
   const newPassword = watch("newPassword");
 
-  const onSubmit = (data) => {
-    console.log("Password change submitted:", data);
-    message.success("Password updated successfully!");
-    reset();
+  const onSubmit = async (data) => {
+    try {
+      await changePassword({
+        old_password: data.currentPassword.trim(),
+        new_password: data.newPassword.trim(),
+        retype_password: data.confirmPassword.trim(),
+      }).unwrap();
+
+      message.success("Password updated successfully!");
+      reset();
+    } catch (err) {
+      const errorMsg =
+        err?.data?.detail ||
+        err?.data?.old_password?.[0] ||
+        err?.data?.new_password?.[0] ||
+        err?.data?.retype_password?.[0] ||
+        "Failed to update password";
+      message.error(errorMsg);
+    }
   };
 
   return (
@@ -43,7 +60,6 @@ const ChangePassword = () => {
         <h2 className="text-xl font-medium text-primary mb-8">
           Change Password
         </h2>
-
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           {/* Current Password */}
           <Form.Item
@@ -125,6 +141,7 @@ const ChangePassword = () => {
             <Button
               htmlType="submit"
               size="large"
+              loading={isLoading}
               className="px-16 text-lg font-semibold rounded-md shadow-lg"
               style={{
                 background: "#5F0629",
@@ -132,7 +149,7 @@ const ChangePassword = () => {
                 border: "none",
               }}
             >
-              Update password
+              {isLoading ? "Updating..." : "Update password"}
             </Button>
           </div>
         </Form>

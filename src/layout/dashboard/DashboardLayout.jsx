@@ -6,6 +6,7 @@ import { LuPanelLeftClose } from "react-icons/lu";
 import DashboardSidebar from "../../components/dashboard/DashboardSidebar";
 import DashboardHeader from "../../components/dashboard/DashboardHeader";
 import { HeaderContext } from "../../contexts/HeaderContext";
+import { useAutoLogout } from "../../hooks/useAutoLogout";
 
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -13,10 +14,13 @@ const DashboardLayout = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
+  useAutoLogout();
+
   const mainContentClass = collapsed ? "lg:ml-[80px]" : "lg:ml-[270px]";
 
   return (
     <HeaderContext.Provider value={{ setTitle, setDescription }}>
+      
       <div className="relative flex h-screen overflow-hidden bg-white">
         {/* Mobile hamburger */}
         <button
