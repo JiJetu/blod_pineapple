@@ -1,4 +1,4 @@
-import { baseApi } from "../api/base.api";
+import { baseApi } from "../../api/base.api";
 
 
 export const studentsApi = baseApi.injectEndpoints({

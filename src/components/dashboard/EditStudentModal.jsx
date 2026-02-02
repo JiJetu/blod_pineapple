@@ -2,7 +2,7 @@ import React from "react";
 import { Form, Input, Select, Button, message } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import ReusableModal from "../shared/modal/Modal";
-import { useEditStudentMutation } from "../../redux/student/student.api";
+import { useEditStudentMutation } from "../../redux/features/student/student.api";
 import { useGetYearsQuery } from "../../redux/features/years/years.api";
 import { useGetFactionsQuery } from "../../redux/features/factions/factions.api";
 import { useGetRoomsQuery } from "../../redux/features/rooms/rooms.api";

@@ -13,7 +13,7 @@ import {
   useDeleteStudentMutation,
   useFilterStudentsQuery,
   useGetStudentsQuery,
-} from "../../redux/student/student.api";
+} from "../../redux/features/student/student.api";
 import { useGetYearsQuery } from "../../redux/features/years/years.api";
 import { useGetFactionsQuery } from "../../redux/features/factions/factions.api";
 

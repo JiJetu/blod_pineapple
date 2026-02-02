@@ -1,7 +1,7 @@
 import { Form, Input, InputNumber, Select, Button, message } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import ReusableModal from "../shared/modal/Modal";
-import { useAddStudentAwardMutation } from "../../redux/student/student.api";
+import { useAddStudentAwardMutation } from "../../redux/features/student/student.api";
 import { useGetAwardsQuery } from "../../redux/features/award/awards.api";
 
 const { Option } = Select;
