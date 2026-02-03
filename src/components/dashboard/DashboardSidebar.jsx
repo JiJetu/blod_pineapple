@@ -69,6 +69,7 @@ const DashboardSidebar = ({ collapsed = false }) => {
     // Clear persisted storage (encrypted)
     await persistor.purge();
     localStorage.removeItem("accessToken");
+    sessionStorage.clear();
     navigate("/login", { replace: true });
   };
 

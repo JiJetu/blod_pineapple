@@ -196,52 +196,59 @@ const CertificateGeneration = () => {
 
   // Handle Excel download - FIXED VERSION
   const handleDownloadExcel = async () => {
-    if (selectedStudents.length === 0) {
-      messageApi.warning({
-        content: "Please select at least one student to download",
-        duration: 3,
-      });
+  if (selectedStudents.length === 0) {
+    messageApi.warning("Please select at least one student to download", 3);
+    return;
+  }
+
+  try {
+    // Get numeric IDs from rawData.id (primary key)
+    const studentIds = selectedStudents
+      .map((studentId) => {
+        const student = students.find((s) => s.id === studentId);
+        return student?.rawData?.id ? Number(student.rawData.id) : null;
+      })
+      .filter((id) => id && !isNaN(id));
+
+    if (studentIds.length === 0) {
+      messageApi.error("No valid student IDs found");
       return;
     }
 
-    try {
-      // Get the selected student objects
-      const selectedStudentObjects = selectedStudents.map(studentId => 
-        students.find(s => s.id === studentId)
-      ).filter(Boolean);
+    console.log("📤 Sending student_ids:", studentIds);
 
-      // Extract student_ids for the API - USE NUMERIC IDs FROM rawData.id
-      const studentIds = selectedStudentObjects.map(student => {
-        // Use the numeric ID from rawData (like 1, 2, 3)
-        return student.rawData.id ? Number(student.rawData.id) : 0;
-      }).filter(id => id > 0);
-      
-      console.log("Downloading Excel for student IDs:", studentIds);
-      
-      const blob = await downloadExcel(studentIds).unwrap();
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `certificate_students_${new Date().toISOString().split('T')[0]}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      messageApi.success({
-        content: "Excel file downloaded successfully",
-        duration: 3,
-      });
-    } catch (error) {
-      console.error("Failed to download Excel:", error);
-      messageApi.error({
-        content: error?.data?.message || error?.data?.detail || "Failed to download Excel file. Please try again.",
-        duration: 4,
-      });
+    const blob = await downloadExcel(studentIds).unwrap();
+
+    if (!blob || blob.size === 0) {
+      messageApi.error("Received empty file from server");
+      return;
     }
-  };
+
+    // Create download link
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `certificate_students_${new Date().toISOString().split("T")[0]}.xlsx`;
+
+    document.body.appendChild(link);
+    link.click();
+
+    // Cleanup
+    document.body.removeChild(link);
+    setTimeout(() => window.URL.revokeObjectURL(url), 100); // delay revoke
+
+    messageApi.success("Excel file downloaded successfully", 3);
+  } catch (error) {
+    console.error("❌ Download failed:", error);
+    messageApi.error(
+      error?.data?.message ||
+      error?.data?.detail ||
+      error?.message ||
+      "Failed to download Excel file. Please try again.",
+      4
+    );
+  }
+};
 
   // Calculate totals
   const totalEligible = students.length;

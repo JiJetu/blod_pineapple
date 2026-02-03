@@ -1,7 +1,9 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { IoNotifications } from "react-icons/io5";
 
 const DashboardHeader = ({ title, description }) => {
+
+  const navigate = useNavigate()
 
   return (
     <div className="flex items-center justify-between py-4 px-2 lg:p-4 bg-[#fbf9f7] dark:bg-[#fbf9f7] text-[#020202] outfit">
@@ -30,7 +32,7 @@ const DashboardHeader = ({ title, description }) => {
         {/* Profile Section based on role */}
         <div className="flex items-center gap-6 cursor-pointer">
           {/* Time + Date */}
-          <div className="flex flex-col leading-tight text-right">
+          <div onClick={() => navigate('/dashboard/settings/account')} className="flex flex-col leading-tight text-right">
             <span className="md:text-lg font-medium text-black py-2 px-5 border border-primary rounded-lg">
               Admin
             </span>

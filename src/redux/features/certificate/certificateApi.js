@@ -29,31 +29,20 @@ export const certificateApi = baseApi.injectEndpoints({
       providesTags: ["Students"],
     }),
 
+
     // Download Excel file
     downloadExcel: builder.mutation({
-      query: (studentIds) => {
-        // Convert to array of numbers for the API
-        const studentIdsArray = Array.isArray(studentIds) 
-          ? studentIds.map(id => {
-              const numId = Number(id);
-              return isNaN(numId) ? 0 : numId;
-            }).filter(id => id > 0)
-          : [];
-        
-        console.log("Sending to download API:", { student_ids: studentIdsArray });
-        
-        return {
-          url: "/certificate/eligible-student/excel/download/",
-          method: "POST",
-          body: {
-            student_ids: studentIdsArray
-          },
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          responseHandler: (response) => response.blob(),
-        };
-      },
+      query: (studentIds) => ({
+        url: "/certificate/eligible-student/excel/dwonload/",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          student_ids: studentIds || [],
+        },
+        responseHandler: (response) => response.blob(),
+      }),
     }),
   }),
 });

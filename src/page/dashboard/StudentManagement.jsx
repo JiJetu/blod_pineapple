@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { RiFolderDownloadFill, RiEditBoxFill } from "react-icons/ri";
 import { FaFilter, FaTrash } from "react-icons/fa";
 import { TbTrophyFilled } from "react-icons/tb";
-import { message, Popconfirm, Select, Input } from "antd";
+import { message, Popconfirm, Select, Input, Button } from "antd";
 import { useHeader } from "../../contexts/HeaderContext";
 import AddStudentModal from "../../components/dashboard/AddStudentModal";
 import AddAwardModal from "../../components/dashboard/AddAwardModal";
@@ -30,6 +30,9 @@ const StudentManagement = () => {
   const [selectedYear, setSelectedYear] = useState(null);
   const [selectedFaction, setSelectedFaction] = useState(null);
 
+  // Sorting state
+  const [sortOrder, setSortOrder] = useState("none"); // "none" | "asc" | "desc"
+
   // API Queries
   const { data: students = [], isLoading, refetch } = useGetStudentsQuery();
   const { data: years = [] } = useGetYearsQuery();
@@ -49,8 +52,23 @@ const StudentManagement = () => {
   });
 
   // Determine which data to display
-  const displayStudents =
+  let displayStudents =
     searchTerm || selectedYear || selectedFaction ? filteredStudents : students;
+
+  // Apply sorting
+  displayStudents = [...displayStudents]; // avoid mutating original array
+  if (sortOrder !== "none") {
+    displayStudents.sort((a, b) => {
+      const nameA = `${a.first_name || ""} ${a.surname || ""}`.trim().toLowerCase();
+      const nameB = `${b.first_name || ""} ${b.surname || ""}`.trim().toLowerCase();
+
+      if (sortOrder === "asc") {
+        return nameA.localeCompare(nameB);
+      } else {
+        return nameB.localeCompare(nameA);
+      }
+    });
+  }
 
   useEffect(() => {
     setTitle("Student Management");
@@ -66,7 +84,6 @@ const StudentManagement = () => {
     // This will be handled by the modal with API
   };
 
-  // Handle Add Award
   const handleAddAward = (awardData) => {
     // This will be handled by the modal with API
     setIsAddAwardOpen(false);
@@ -77,7 +94,7 @@ const StudentManagement = () => {
     try {
       await archiveStudent(student.id).unwrap();
       message.success(
-        `${student.first_name} ${student.surname} archived successfully`,
+        `${student.first_name} ${student.surname} archived successfully`
       );
       refetch();
     } catch (error) {
@@ -89,7 +106,7 @@ const StudentManagement = () => {
     try {
       await deleteStudent(student.id).unwrap();
       message.success(
-        `${student.first_name} ${student.surname} deleted successfully`,
+        `${student.first_name} ${student.surname} deleted successfully`
       );
       refetch();
     } catch (error) {
@@ -102,6 +119,19 @@ const StudentManagement = () => {
     setSelectedYear(null);
     setSelectedFaction(null);
   };
+
+  const toggleSort = () => {
+    if (sortOrder === "none") {
+      setSortOrder("asc");
+    } else if (sortOrder === "asc") {
+      setSortOrder("desc");
+    } else {
+      setSortOrder("none");
+    }
+  };
+
+  const sortButtonText =
+    sortOrder === "none" ? "Sort A-Z" : sortOrder === "asc" ? "Sort by Default" : "Sort A-Z";
 
   return (
     <div className="bg-[#fbf9f7] px-6 roboto">
@@ -161,11 +191,14 @@ const StudentManagement = () => {
         </button>
       </div>
 
-      {/* Student List */}
+      {/* Student List Header */}
       <div className="flex items-center justify-between mb-4 mt-8">
         <h3 className="text-2xl text-black">Student List</h3>
-        <button className="text-primary flex items-center gap-1 font-medium bg-white border border-[#777777] rounded-md px-4 py-2">
-          ↑↓ Sort A-Z
+        <button
+          onClick={toggleSort}
+          className="text-primary flex items-center gap-1 font-medium bg-white border border-[#777777] rounded-md px-4 py-2 hover:bg-gray-50 transition"
+        >
+          ↑↓ {sortButtonText}
         </button>
       </div>
 

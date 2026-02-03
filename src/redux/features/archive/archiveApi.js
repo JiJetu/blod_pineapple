@@ -8,7 +8,7 @@ export const archiveApi = baseApi.injectEndpoints({
         url: "/archived/statics/",
         method: "GET",
       }),
-      providesTags: ["Archive"],
+      providesTags: ["Archive", "Students"],
     }),
 
     // Get archived students list

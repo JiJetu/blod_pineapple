@@ -26,6 +26,6 @@ const baseQueryWithExpiryGuard = async (args, api, extraOptions) => {
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithExpiryGuard,
-  tagTypes: ["Awards", "Years", "Factions", "Rooms", "Quantities", "User", "Students", "StudentAwards", "AwardRules", "Certificates", "Archive"],
+  tagTypes: ["Awards", "Years", "Factions", "Rooms", "Quantities", "User", "Students", "StudentAwards", "AwardRules", "Certificates", "Archive", "DashboardStats"],
   endpoints: () => ({}),
 });

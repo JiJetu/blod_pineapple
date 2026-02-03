@@ -57,7 +57,7 @@ export const studentsApi = baseApi.injectEndpoints({
         url: `/student/students/${studentId}/archive/`,
         method: "POST",
       }),
-      invalidatesTags: ["Students"],
+      invalidatesTags: ["Students", "Archive"],
     }),
 
     // Edit student
