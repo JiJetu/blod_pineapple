@@ -78,6 +78,20 @@ export const studentsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Students"],
     }),
+
+    // Bulk import students via Excel
+    bulkImportStudents: builder.mutation({
+      query: (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        return {
+          url: "/student/students/bulk-import/",
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Students", "Years", "Rooms", "Factions"],
+    }),
   }),
 });
 
@@ -90,4 +104,5 @@ export const {
   useArchiveStudentMutation,
   useEditStudentMutation,
   useDeleteStudentMutation,
+  useBulkImportStudentsMutation,
 } = studentsApi;

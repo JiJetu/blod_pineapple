@@ -15,22 +15,6 @@ const Login = () => {
     console.log(data);
     try {
       await login(data).unwrap();
-      // const fakeResponse = {
-      //   token: "fake-jwt-access-token",
-      //   user: {
-      //     id: 1,
-      //     name: "John Doe",
-      //     email: data.email,
-      //   },
-      // };
-
-      // dispatch(
-      //   setCredentials({
-      //     token: fakeResponse.token,
-      //     user: fakeResponse.user,
-      //   }),
-      // );
-
       navigate("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);

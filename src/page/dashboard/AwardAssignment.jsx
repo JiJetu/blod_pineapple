@@ -21,14 +21,14 @@ const AwardAssignment = () => {
     isLoading: isLoadingRules,
     isError: isRulesError,
     error: rulesError 
-  } = useGetAwardRulesQuery();
+  } = useGetAwardRulesQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
   
   const { 
     data: studentsData, 
     isLoading: isLoadingStudents,
     isError: isStudentsError,
     error: studentsError 
-  } = useGetStudentsQuery();
+  } = useGetStudentsQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
 
   // Add awards query
   const { 
@@ -36,7 +36,7 @@ const AwardAssignment = () => {
     isLoading: isLoadingAwards,
     isError: isAwardsError,
     error: awardsError 
-  } = useGetAwardsQuery();
+  } = useGetAwardsQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
 
   const [assignAward, { isLoading: isAssigning }] = useAssignAwardMutation();
 
@@ -58,7 +58,6 @@ const AwardAssignment = () => {
   useEffect(() => {
     // Find Greenies award from the awards data
     if (awardsData) {
-      console.log("Processing awards data:", awardsData);
       
       let awardList = [];
       
@@ -79,14 +78,12 @@ const AwardAssignment = () => {
         return awardName.includes("green") || awardName.includes("greenies");
       });
       
-      console.log("Found Greenies award:", greenies);
       setGreeniesAward(greenies || null);
     }
   }, [awardsData]);
 
   useEffect(() => {
     if (studentsData) {
-      console.log("Processing students data:", studentsData);
       
       let studentList = [];
       
@@ -101,7 +98,6 @@ const AwardAssignment = () => {
         studentList = studentsData.students;
       }
       
-      console.log("Extracted student list:", studentList);
       
       // Process and clean the student data
       const cleanedStudents = studentList.map((student, index) => {
@@ -110,7 +106,6 @@ const AwardAssignment = () => {
         // Try different possible property names for Name
         const name = student.name || student.full_name || student.student_name || student.username || `Student ${index + 1}`;
         
-        console.log(`Student ${index}:`, { id, name, raw: student });
         
         return {
           ...student,
@@ -119,7 +114,6 @@ const AwardAssignment = () => {
         };
       }).filter(student => student.id && student.name);
       
-      console.log("Cleaned students:", cleanedStudents);
       setStudents(cleanedStudents);
     }
   }, [studentsData]);
@@ -333,6 +327,7 @@ const AwardAssignment = () => {
                     placeholder={isLoadingStudents ? "Loading students..." : "Choose a student"}
                     optionFilterProp="children"
                     className="h-11"
+                    virtual
                     disabled={isLoadingStudents || students.length === 0 || !greeniesAward}
                     filterOption={(input, option) => {
                       if (!option || !option.children) return false;

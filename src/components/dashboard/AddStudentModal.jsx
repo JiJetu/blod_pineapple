@@ -11,9 +11,9 @@ const { Option } = Select;
 
 const AddStudentModal = ({ open, onCancel, onSubmit }) => {
   const [createStudent, { isLoading }] = useCreateStudentMutation();
-  const { data: years = [] } = useGetYearsQuery();
-  const { data: factions = [] } = useGetFactionsQuery();
-  const { data: rooms = [] } = useGetRoomsQuery();
+  const { data: years = [], isLoading: isYearsLoading } = useGetYearsQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
+  const { data: factions = [], isLoading: isFactionsLoading } = useGetFactionsQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
+  const { data: rooms = [], isLoading: isRoomsLoading } = useGetRoomsQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
 
   const {
     control,
@@ -178,7 +178,7 @@ const AddStudentModal = ({ open, onCancel, onSubmit }) => {
               control={control}
               rules={{ required: "Year is required" }}
               render={({ field }) => (
-                <Select {...field} placeholder="Select year" className="h-11">
+                <Select {...field} placeholder="Select year" className="h-11" loading={isYearsLoading} virtual>
                   {years.map((year) => (
                     <Option key={year.id} value={year.id}>
                       {year.name}
@@ -205,6 +205,8 @@ const AddStudentModal = ({ open, onCancel, onSubmit }) => {
                   {...field}
                   placeholder="Select faction"
                   className="h-11"
+                  loading={isFactionsLoading}
+                  virtual
                 >
                   {factions.map((faction) => (
                     <Option key={faction.id} value={faction.id}>
@@ -228,7 +230,7 @@ const AddStudentModal = ({ open, onCancel, onSubmit }) => {
               control={control}
               rules={{ required: "Room is required" }}
               render={({ field }) => (
-                <Select {...field} placeholder="Select room" className="h-11">
+                <Select {...field} placeholder="Select room" className="h-11" loading={isRoomsLoading} virtual>
                   {rooms.map((room) => (
                     <Option key={room.id} value={room.id}>
                       {room.name}

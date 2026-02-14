@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { RiFolderDownloadFill, RiEditBoxFill } from "react-icons/ri";
 import { FaFilter, FaTrash } from "react-icons/fa";
 import { TbTrophyFilled } from "react-icons/tb";
-import { message, Popconfirm, Select, Input, Button } from "antd";
+import { message, Popconfirm, Select, Input } from "antd";
 import { useHeader } from "../../contexts/HeaderContext";
 import AddStudentModal from "../../components/dashboard/AddStudentModal";
 import AddAwardModal from "../../components/dashboard/AddAwardModal";

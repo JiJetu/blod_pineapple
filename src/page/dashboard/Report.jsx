@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Select, Checkbox, Button } from "antd";
 import { DownloadOutlined, UploadOutlined } from "@ant-design/icons";
 import { ICONS } from "../../assets";
@@ -146,7 +146,7 @@ const Report = () => {
 
   const toggleCheck = (name) => {
     setCheckedItems((prev) =>
-      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
     );
   };
 

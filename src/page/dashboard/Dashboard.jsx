@@ -92,7 +92,7 @@ const Dashboard = () => {
   const factionSummary = useMemo(() => {
     return Object.values(factionMap).map((f) => ({
       name: f.name,
-      points: f.total_awards,
+      points: f.total_awards || f.total_students,
       color: f.color,
       logo: f.logo,
       total_students: f.total_students || 0,

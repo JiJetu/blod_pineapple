@@ -12,9 +12,9 @@ const { Option } = Select;
 
 const EditStudentModal = ({ open, onCancel, onSubmit, student }) => {
   const [editStudent, { isLoading }] = useEditStudentMutation();
-  const { data: years = [] } = useGetYearsQuery();
-  const { data: factions = [] } = useGetFactionsQuery();
-  const { data: rooms = [] } = useGetRoomsQuery();
+  const { data: years = [], isLoading: isYearsLoading } = useGetYearsQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
+  const { data: factions = [], isLoading: isFactionsLoading } = useGetFactionsQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
+  const { data: rooms = [], isLoading: isRoomsLoading } = useGetRoomsQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
 
   const {
     control,
@@ -122,7 +122,7 @@ const EditStudentModal = ({ open, onCancel, onSubmit, student }) => {
               control={control}
               rules={{ required: "Year is required" }}
               render={({ field }) => (
-                <Select {...field} placeholder="Select year" className="h-11">
+                <Select {...field} placeholder="Select year" className="h-11" loading={isYearsLoading} virtual>
                   {years.map((y) => (
                     <Option key={y.id} value={y.id}>{y.name}</Option>
                   ))}
@@ -139,7 +139,7 @@ const EditStudentModal = ({ open, onCancel, onSubmit, student }) => {
               control={control}
               rules={{ required: "Faction is required" }}
               render={({ field }) => (
-                <Select {...field} placeholder="Select faction" className="h-11">
+                <Select {...field} placeholder="Select faction" className="h-11" loading={isFactionsLoading} virtual>
                   {factions.map((f) => (
                     <Option key={f.id} value={f.id}>{f.name}</Option>
                   ))}
@@ -156,7 +156,7 @@ const EditStudentModal = ({ open, onCancel, onSubmit, student }) => {
               control={control}
               rules={{ required: "Room is required" }}
               render={({ field }) => (
-                <Select {...field} placeholder="Select room" className="h-11">
+                <Select {...field} placeholder="Select room" className="h-11" loading={isRoomsLoading} virtual>
                   {rooms.map((r) => (
                     <Option key={r.id} value={r.id}>{r.name}</Option>
                   ))}
@@ -186,4 +186,4 @@ const EditStudentModal = ({ open, onCancel, onSubmit, student }) => {
   );
 };
 
-export default EditStudentModal;
+export default React.memo(EditStudentModal);

@@ -14,7 +14,7 @@ const AddAwardModal = ({
   studentId,
 }) => {
   const [addStudentAward, { isLoading }] = useAddStudentAwardMutation();
-  const { data: awards = [] } = useGetAwardsQuery();
+  const { data: awards = [], isLoading: isAwardsLoading } = useGetAwardsQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
 
   const {
     control,
@@ -30,7 +30,6 @@ const AddAwardModal = ({
   });
 
   const onSubmitForm = async (data) => {
-    console.log("student", studentId)
     if (!studentId) {
       message.error("Student ID is required");
       return;
@@ -86,6 +85,8 @@ const AddAwardModal = ({
                 {...field}
                 placeholder="Select award type"
                 className="h-11"
+                loading={isAwardsLoading}
+                virtual
                 prefix={
                   <span className="text-gray-500 mr-2 flex items-center justify-center">
                     <svg
