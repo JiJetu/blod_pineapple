@@ -35,8 +35,8 @@ const StudentManagement = () => {
 
   // API Queries
   const { data: students = [], isLoading, refetch } = useGetStudentsQuery();
-  const { data: years = [] } = useGetYearsQuery();
-  const { data: factions = [] } = useGetFactionsQuery();
+  const { data: years = [], isLoading: isYearsLoading } = useGetYearsQuery();
+  const { data: factions = [], isLoading: isFactionsLoading } = useGetFactionsQuery();
   const [deleteStudent] = useDeleteStudentMutation();
   const [archiveStudent] = useArchiveStudentMutation();
 
@@ -167,6 +167,8 @@ const StudentManagement = () => {
             value={selectedYear}
             onChange={setSelectedYear}
             className="w-full h-11"
+            disabled={isYearsLoading}
+            loading={isYearsLoading}
             options={years.map((year) => ({
               value: year.id,
               label: year.name,
@@ -177,6 +179,8 @@ const StudentManagement = () => {
             value={selectedFaction}
             onChange={setSelectedFaction}
             className="w-full h-11"
+            disabled={isFactionsLoading}
+            loading={isFactionsLoading}
             options={factions.map((faction) => ({
               value: faction.id,
               label: faction.name,

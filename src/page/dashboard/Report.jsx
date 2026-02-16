@@ -1,154 +1,63 @@
-import { useEffect, useState } from "react";
-import { Select, Checkbox, Button } from "antd";
+import { useEffect, useState, useMemo } from "react";
+import { Checkbox, Button, Spin } from "antd";
 import { DownloadOutlined, UploadOutlined } from "@ant-design/icons";
-import { ICONS } from "../../assets";
 import { useHeader } from "../../contexts/HeaderContext";
 import UploadReportModal from "../../components/dashboard/UploadReportModal";
+import { useGetFactionStatsQuery, useGetFactionYearWiseStatsQuery } from "../../redux/features/factions/factions.api";
+import { useDownloadStudentsByFactionMutation, useDownloadStudentsByYearMutation } from "../../redux/features/certificate/certificateApi";
 
-const years = ["2023", "2024", "2025", "2026"];
-
-const FACTION_ICONS = {
-  Bilbies: ICONS.Bilbies,
-  Bandicoots: ICONS.Bandicoots,
-  Wallabies: ICONS.Wallabies,
-  Numbats: ICONS.Numbats,
-};
-
-const factionData = [
-  {
-    name: "Bilbies",
-    totalStudents: 20,
-    totalAwards: 34,
-    pinky: 245,
-    certificate: 16,
-    bronze: 1,
-    silver: 103,
-    gold: 16,
-    goldMetal: 1,
-    bronzeMedallion: 103,
-    silverMedallion: 16,
-    goldMedallion: 1,
-  },
-  {
-    name: "Bandicoots",
-    totalStudents: 20,
-    totalAwards: 34,
-    pinky: 245,
-    certificate: 16,
-    bronze: 1,
-    silver: 103,
-    gold: 16,
-    goldMetal: 1,
-    bronzeMedallion: 103,
-    silverMedallion: 16,
-    goldMedallion: 1,
-  },
-  {
-    name: "Wallabies",
-    totalStudents: 20,
-    totalAwards: 34,
-    pinky: 245,
-    certificate: 16,
-    bronze: 1,
-    silver: 103,
-    gold: 16,
-    goldMetal: 1,
-    bronzeMedallion: 103,
-    silverMedallion: 16,
-    goldMedallion: 1,
-  },
-  {
-    name: "Numbats",
-    totalStudents: 20,
-    totalAwards: 34,
-    pinky: 245,
-    certificate: 16,
-    bronze: 1,
-    silver: 103,
-    gold: 16,
-    goldMetal: 1,
-    bronzeMedallion: 103,
-    silverMedallion: 16,
-    goldMedallion: 1,
-  },
-];
-
-const yearData = [
-  {
-    name: "Year 1",
-    totalStudents: 20,
-    totalAwards: 34,
-    pinky: 25,
-    certificate: 16,
-    bronze: 1,
-    silver: 103,
-    gold: 16,
-    goldMetal: 1,
-    bronzeMedallion: 103,
-    silverMedallion: 16,
-    goldMedallion: 1,
-  },
-  {
-    name: "Year 2",
-    totalStudents: 20,
-    totalAwards: 34,
-    pinky: 245,
-    certificate: 16,
-    bronze: 1,
-    silver: 103,
-    gold: 16,
-    goldMetal: 1,
-    bronzeMedallion: 103,
-    silverMedallion: 16,
-    goldMedallion: 1,
-  },
-  {
-    name: "Year 3",
-    totalStudents: 20,
-    totalAwards: 34,
-    pinky: 245,
-    certificate: 16,
-    bronze: 1,
-    silver: 103,
-    gold: 16,
-    goldMetal: 1,
-    bronzeMedallion: 103,
-    silverMedallion: 16,
-    goldMedallion: 1,
-  },
-  {
-    name: "Year 4",
-    totalStudents: 20,
-    totalAwards: 34,
-    pinky: 245,
-    certificate: 16,
-    bronze: 1,
-    silver: 103,
-    gold: 16,
-    goldMetal: 1,
-    bronzeMedallion: 103,
-    silverMedallion: 16,
-    goldMedallion: 1,
-  },
-];
 
 const Report = () => {
-  const [selectedYear, setSelectedYear] = useState("2024");
   const [activeTab, setActiveTab] = useState("faction");
   const [checkedItems, setCheckedItems] = useState([]);
   const { setTitle, setDescription } = useHeader();
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const { data: factionStats = [], isLoading: isFactionLoading } = useGetFactionStatsQuery(undefined, {
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
+  const { data: yearStats = [], isLoading: isYearLoading } = useGetFactionYearWiseStatsQuery(undefined, {
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
+  const [downloadByFaction, { isLoading: isDownloadingFaction }] = useDownloadStudentsByFactionMutation();
+  const [downloadByYear, { isLoading: isDownloadingYear }] = useDownloadStudentsByYearMutation();
 
   useEffect(() => {
     setTitle("Reports Module");
     setDescription("View & export detailed award reports");
   }, [setTitle, setDescription]);
 
-  const toggleCheck = (name) => {
+  const toggleCheck = (id) => {
     setCheckedItems((prev) =>
-      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
+      prev.includes(id) ? prev.filter((n) => n !== id) : [...prev, id],
     );
   };
+
+  const factionData = useMemo(() => {
+    return (Array.isArray(factionStats) ? factionStats : []).map((item) => ({
+      id: item?.faction?.id,
+      name: item?.faction?.name || "Unknown",
+      logo: item?.faction?.logo || null,
+      totalStudents: item?.total_students ?? 0,
+      totalAwards: item?.total_award ?? 0,
+      Bronze: item?.Bronze ?? 0,
+      Silver: item?.Silver ?? 0,
+      Gold: item?.Gold ?? 0,
+    }));
+  }, [factionStats]);
+
+  const yearData = useMemo(() => {
+    return (Array.isArray(yearStats) ? yearStats : []).map((item) => ({
+      id: item?.year?.id,
+      name: item?.year?.name || "Unknown",
+      totalStudents: item?.total_students ?? 0,
+      totalAwards: item?.total_award ?? 0,
+      Bronze: item?.Bronze ?? 0,
+      Silver: item?.Silver ?? 0,
+      Gold: item?.Gold ?? 0,
+    }));
+  }, [yearStats]);
 
   const data = activeTab === "faction" ? factionData : yearData;
 
@@ -156,23 +65,7 @@ const Report = () => {
     <div className="bg-[#fbf9f7] min-h-screen p-6 roboto">
       <div>
         {/* Top Bar */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-8 flex gap-4 justify-between md:items-center">
-          <div className="flex flex-col gap-4 w-full">
-            <span className="text-gray-700 font-medium md:text-lg">
-              Filter by Year
-            </span>
-            <Select
-              value={selectedYear}
-              onChange={setSelectedYear}
-              className="md:w-1/3"
-            >
-              {years.map((y) => (
-                <Select.Option key={y} value={y}>
-                  {y}
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
+        <div className="bg-white rounded-xl shadow-md p-6 mb-8 flex justify-end md:items-center">
           <Button
             icon={<UploadOutlined />}
             onClick={() => setIsUploadModalOpen(true)}
@@ -208,112 +101,124 @@ const Report = () => {
         </div>
 
         {/* Individual Cards */}
-        <div className="space-y-6">
-          {data.map((item) => {
-            const isChecked = checkedItems.includes(item.name);
-            const icon =
-              activeTab === "faction" ? FACTION_ICONS[item.name] : null;
+        {activeTab === "faction" ? (
+          isFactionLoading ? (
+            <div className="flex justify-center items-center py-24">
+              <Spin size="large" />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {data.map((item) => {
+                const isChecked = checkedItems.includes(item.id);
+                const icon = item.logo;
 
-            return (
-              <div
-                key={item.name}
-                className="bg-white rounded-2xl shadow-md p-8"
-              >
-                {/* Header: Icon/Name + Totals */}
-                <div className="flex justify-between items-center mb-8">
-                  <div className="flex items-center gap-6">
-                    <Checkbox
-                      checked={isChecked}
-                      onChange={() => toggleCheck(item.name)}
-                    />
-                    {icon && (
-                      <img src={icon} alt={item.name} className="w-10 h-10" />
-                    )}
-                    <h3 className="text-xl font-bold text-gray-900">
-                      {item.name}
-                    </h3>
+                return (
+                  <div
+                    key={item.name}
+                    className="bg-white rounded-2xl shadow-md p-8"
+                  >
+                    
+                    <div className="flex justify-between items-center mb-8">
+                      <div className="flex items-center gap-6">
+                        <Checkbox
+                          checked={isChecked}
+                          onChange={() => toggleCheck(item.id)}
+                          disabled={isFactionLoading}
+                        />
+                        {icon && (
+                          <img src={icon} alt={item.name} className="w-10 h-10" />
+                        )}
+                        <h3 className="text-xl font-bold text-gray-900">
+                          {item.name}
+                        </h3>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-gray-900">
+                          Total Student : {item.totalStudents}
+                        </div>
+                        <div className="text-lg font-bold text-gray-900">
+                          Total award : {item.totalAwards}
+                        </div>
+                      </div>
+                    </div>
+
+                    
+                    <div className="grid grid-cols-3 gap-x-24 gap-y-6 pl-16">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 w-32">Bronze</span>
+                        <span className="font-bold text-gray-900">{item.Bronze}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 w-32">Silver</span>
+                        <span className="font-bold text-gray-900">{item.Silver}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 w-32">Gold</span>
+                        <span className="font-bold text-gray-900">{item.Gold}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )
+        ) : isYearLoading ? (
+          <div className="flex justify-center items-center py-24">
+            <Spin size="large" />
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {data.map((item) => {
+              const isChecked = checkedItems.includes(item.id);
+              return (
+                <div
+                  key={item.name}
+                  className="bg-white rounded-2xl shadow-md p-8"
+                >
+                  
+                  <div className="flex justify-between items-center mb-8">
+                    <div className="flex items-center gap-6">
+                      <Checkbox
+                        checked={isChecked}
+                        onChange={() => toggleCheck(item.id)}
+                        disabled={isYearLoading}
+                      />
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {item.name}
+                      </h3>
+                    </div>
+
+                    <div className="text-right">
+                      <div className="text-lg font-bold text-gray-900">
+                        Total Student : {item.totalStudents}
+                      </div>
+                      <div className="text-lg font-bold text-gray-900">
+                        Total award : {item.totalAwards}
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="text-right">
-                    <div className="text-lg font-bold text-gray-900">
-                      Total Student : {item.totalStudents}
+                  
+                  <div className="grid grid-cols-3 gap-x-24 gap-y-6 pl-16">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 w-32">Bronze</span>
+                      <span className="font-bold text-gray-900">{item.Bronze}</span>
                     </div>
-                    <div className="text-lg font-bold text-gray-900">
-                      Total award : {item.totalAwards}
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 w-32">Silver</span>
+                      <span className="font-bold text-gray-900">{item.Silver}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 w-32">Gold</span>
+                      <span className="font-bold text-gray-900">{item.Gold}</span>
                     </div>
                   </div>
                 </div>
-
-                {/* 3-Column Award Grid */}
-                <div className="grid grid-cols-3 gap-x-24 gap-y-6 pl-16">
-                  {" "}
-                  {/* pl-16 to align with name */}
-                  {/* Row 1 */}
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 w-32">Pinky</span>
-                    <span className="font-bold text-gray-900">
-                      {item.pinky}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 w-32">Silver</span>
-                    <span className="font-bold text-gray-900">
-                      {item.silver}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium text-[#CD7F32] w-40">
-                      Bronze Medallion
-                    </span>
-                    <span className="font-bold text-gray-900">
-                      {item.bronzeMedallion}
-                    </span>
-                  </div>
-                  {/* Row 2 */}
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 w-32">Certificate</span>
-                    <span className="font-bold text-gray-900">
-                      {item.certificate}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 w-32">Gold</span>
-                    <span className="font-bold text-gray-900">{item.gold}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium text-[#C0C0C0] w-40">
-                      Silver Medallion
-                    </span>
-                    <span className="font-bold text-gray-900">
-                      {item.silverMedallion}
-                    </span>
-                  </div>
-                  {/* Row 3 */}
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 w-32">Bronze</span>
-                    <span className="font-bold text-gray-900">
-                      {item.bronze}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 w-32">Gold Metal</span>
-                    <span className="font-bold text-gray-900">
-                      {item.goldMetal}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium text-[#FFD700] w-40">
-                      Gold Medallion
-                    </span>
-                    <span className="font-bold text-gray-900">
-                      {item.goldMedallion}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Download Button */}
         <div className="text-center mt-12">
@@ -322,6 +227,25 @@ const Report = () => {
             size="large"
             className="px-16 rounded-full text-lg font-semibold shadow-lg"
             style={{ background: "#5F0629", color: "white" }}
+            disabled={(activeTab === "faction" && (checkedItems.length === 0 || isFactionLoading)) || (activeTab === "year" && (checkedItems.length === 0 || isYearLoading))}
+            loading={isDownloadingFaction || isDownloadingYear}
+            onClick={async () => {
+              try {
+                const blob = activeTab === "faction"
+                  ? await downloadByFaction(checkedItems).unwrap()
+                  : await downloadByYear(checkedItems).unwrap();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = activeTab === "faction" ? "students_by_faction.xlsx" : "students_by_year.xlsx";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+              } catch (e) {
+                console.error("Download failed", e);
+              }
+            }}
           >
             Download
           </Button>

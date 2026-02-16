@@ -40,6 +40,15 @@ export const factionsApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Factions"],
     }),
+    
+    // Year-wise overall statistics
+    getFactionYearWiseStats: builder.query({
+      query: () => ({
+        url: "/faction/year_wise_statics/",
+        method: "GET",
+      }),
+      providesTags: ["Factions"],
+    }),
   }),
 });
 
@@ -49,4 +58,5 @@ export const {
   useDeleteFactionMutation,
   useGetFactionStatsQuery,
   useGetFactionStatsByYearQuery,
+  useGetFactionYearWiseStatsQuery,
 } = factionsApi;

@@ -44,6 +44,36 @@ export const certificateApi = baseApi.injectEndpoints({
         responseHandler: (response) => response.blob(),
       }),
     }),
+    
+    // Download students by selected factions
+    downloadStudentsByFaction: builder.mutation({
+      query: (factionIds) => ({
+        url: "/certificate/download/students/by_faction/",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          factions_ids: factionIds || [],
+        },
+        responseHandler: (response) => response.blob(),
+      }),
+    }),
+    
+    // Download students by selected years
+    downloadStudentsByYear: builder.mutation({
+      query: (yearIds) => ({
+        url: "/certificate/download/students/by_year/",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          year_ids: yearIds || [],
+        },
+        responseHandler: (response) => response.blob(),
+      }),
+    }),
   }),
 });
 
@@ -52,4 +82,6 @@ export const {
   useGetEligibleStudentsQuery,
   useFilterEligibleStudentsQuery,
   useDownloadExcelMutation,
+  useDownloadStudentsByFactionMutation,
+  useDownloadStudentsByYearMutation,
 } = certificateApi;

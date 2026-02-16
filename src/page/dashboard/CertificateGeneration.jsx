@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
-import { Checkbox, Button, Select, message, Spin, Typography } from "antd";
+import { useEffect, useMemo, useState } from "react";
+import { Checkbox, Button, Select, message, Spin } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import { useHeader } from "../../contexts/HeaderContext";
-import { useDownloadExcelMutation, useFilterEligibleStudentsQuery, useGetCertificateStatsQuery, useGetEligibleStudentsQuery } from "../../redux/features/certificate/certificateApi";
+import {
+  useDownloadExcelMutation,
+  useFilterEligibleStudentsQuery,
+  useGetCertificateStatsQuery,
+  useGetEligibleStudentsQuery,
+} from "../../redux/features/certificate/certificateApi";
 import { useGetYearsQuery } from "../../redux/features/years/years.api";
 
 const { Option } = Select;
-const { Text } = Typography;
 
 const CertificateGeneration = () => {
   const [selectedStudents, setSelectedStudents] = useState([]);
@@ -15,159 +19,141 @@ const CertificateGeneration = () => {
   const [messageApi, contextHolder] = message.useMessage();
 
   // API hooks
-  const { 
-    data: statsData, 
+  const {
+    data: statsData,
     isLoading: isLoadingStats,
     isError: isStatsError,
-    error: statsError 
+    error: statsError,
   } = useGetCertificateStatsQuery();
-  
-  const { 
-    data: eligibleStudentsData, 
+
+  const {
+    data: eligibleStudentsData,
     isLoading: isLoadingStudents,
     isError: isStudentsError,
     error: studentsError,
-    refetch: refetchStudents 
+    refetch: refetchStudents,
   } = useGetEligibleStudentsQuery();
-  
-  const { 
+
+  const {
     data: filteredStudentsData,
     isLoading: isLoadingFiltered,
     isError: isFilteredError,
-    error: filteredError 
+    error: filteredError,
   } = useFilterEligibleStudentsQuery(selectedYear, {
     skip: !selectedYear,
   });
-  
-  const { 
-    data: yearsData, 
+
+  const {
+    data: yearsData,
     isLoading: isLoadingYears,
     isError: isYearsError,
-    error: yearsError 
+    error: yearsError,
   } = useGetYearsQuery();
-  
-  const [downloadExcel, { isLoading: isDownloading }] = useDownloadExcelMutation();
 
-  const [students, setStudents] = useState([]);
-  const [years, setYears] = useState([]);
-  const [totalCertificates, setTotalCertificates] = useState(0);
+  const [downloadExcel, { isLoading: isDownloading }] =
+    useDownloadExcelMutation();
+
+  const totalCertificates = useMemo(() => {
+    if (!statsData) return 0;
+    return (
+      statsData.total_certificates ||
+      statsData.certificates_count ||
+      statsData.total ||
+      statsData.count ||
+      0
+    );
+  }, [statsData]);
 
   useEffect(() => {
     setTitle("Certificate Generation");
     setDescription("Generate & print certificate for eligible students");
   }, [setTitle, setDescription]);
 
-  // Process years data
-  useEffect(() => {
-    if (yearsData && Array.isArray(yearsData)) {
-      const cleanedYears = yearsData.map(year => ({
+  const years = useMemo(() => {
+    if (!yearsData || !Array.isArray(yearsData)) return [];
+    return yearsData
+      .map((year) => ({
         id: year.id || year._id || year.year_id,
         name: year.name || year.year_name || year.year,
         is_active: year.is_active || false,
-      })).filter(year => year.id && year.name);
-      
-      setYears(cleanedYears);
-    }
+      }))
+      .filter((year) => year.id && year.name);
   }, [yearsData]);
 
-  // Process stats data - KEEPING YOUR ORIGINAL LOGIC
-  useEffect(() => {
-    if (statsData) {
-      const total = statsData.total_certificates || 
-                    statsData.certificates_count || 
-                    statsData.total || 
-                    statsData.count || 
-                    0;
-      setTotalCertificates(total);
-    }
-  }, [statsData]);
-
-  // Process students data - KEEPING YOUR ORIGINAL LOGIC
-  useEffect(() => {
+  const students = useMemo(() => {
     let studentList = [];
-    
-    // Use filtered data if year is selected, otherwise use all eligible students
     if (selectedYear && filteredStudentsData) {
-      console.log("Filtered students data:", filteredStudentsData);
       studentList = filteredStudentsData;
     } else if (!selectedYear && eligibleStudentsData) {
-      console.log("All eligible students data:", eligibleStudentsData);
       studentList = eligibleStudentsData;
     }
-    
-    // Process students based on your API response structure
     if (Array.isArray(studentList)) {
-      const processedStudents = studentList.map((student) => {
-        // Extract ID - use student.id as the primary ID
-        const id = student.id ? String(student.id).trim() : "";
-        
-        // Extract name from first_name and surname
-        const name = `${student.first_name || ''} ${student.surname || ''}`.trim();
-        
-        // Extract faction name from nested object
-        const faction = student.faction?.name || 
-                       student.faction_name || 
-                       student.faction || 
-                       "N/A";
-        
-        // Extract year name from nested object
-        const year = student.year?.name || 
-                    student.year_name || 
-                    student.year || 
-                    "N/A";
-        
-        // Extract room name from nested object
-        const room = student.room?.name || 
-                    student.room_name || 
-                    student.room || 
-                    "N/A";
-        
-        // Note: Your API response doesn't show certificates or awardLevel
-        // Keeping your original code for these fields
-        const certificates = student.certificates || 
-                           student.certificate_count || 
-                           student.total_certificates || 
-                           "-";
-        
-        const awardLevel = student.award_level || 
-                          student.awardLevel || 
-                          student.current_award || 
-                          "N/A";
-        
-        return {
-          id: id,
-          student_id: student.student_id ? String(student.student_id).trim() : "",
-          name: name,
-          faction: String(faction).trim(),
-          year: String(year).trim(),
-          room: String(room).trim(),
-          certificates: certificates ? String(certificates).trim() : "-",
-          awardLevel: String(awardLevel).trim(),
-          rawData: student
-        };
-      }).filter(student => student.id && student.name);
-      
-      console.log("Processed students:", processedStudents);
-      setStudents(processedStudents);
+      return studentList
+        .map((student) => {
+          const id = student.id ? String(student.id).trim() : "";
+          const name = `${student.first_name || ""} ${student.surname || ""}`.trim();
+          const faction =
+            student.faction?.name ||
+            student.faction_name ||
+            student.faction ||
+            "N/A";
+          const year =
+            student.year?.name || student.year_name || student.year || "N/A";
+          const room =
+            student.room?.name || student.room_name || student.room || "N/A";
+          const certificates =
+            student.certificates ||
+            student.certificate_count ||
+            student.total_certificates ||
+            "-";
+          const awardLevel =
+            student.award_level ||
+            student.awardLevel ||
+            student.current_award ||
+            "N/A";
+          return {
+            id,
+            student_id: student.student_id ? String(student.student_id).trim() : "",
+            name,
+            faction: String(faction).trim(),
+            year: String(year).trim(),
+            room: String(room).trim(),
+            certificates: certificates ? String(certificates).trim() : "-",
+            awardLevel: String(awardLevel).trim(),
+            rawData: student,
+          };
+        })
+        .filter((student) => student.id && student.name);
     } else if (studentList && studentList.results && Array.isArray(studentList.results)) {
-      // Handle paginated response
-      const processedStudents = studentList.results.map((student) => ({
-        id: student.id ? String(student.id).trim() : "",
-        student_id: student.student_id ? String(student.student_id).trim() : "",
-        name: `${student.first_name || ''} ${student.surname || ''}`.trim(),
-        faction: String(student.faction?.name || student.faction_name || student.faction || "N/A").trim(),
-        year: String(student.year?.name || student.year_name || student.year || "N/A").trim(),
-        room: String(student.room?.name || student.room_name || student.room || "N/A").trim(),
-        certificates: student.certificates ? String(student.certificates).trim() : "-",
-        awardLevel: String(student.award_level || student.awardLevel || student.current_award || "N/A").trim(),
-        rawData: student
-      })).filter(student => student.id && student.name);
-      
-      setStudents(processedStudents);
-    } else if (studentList) {
-      console.log("Unexpected student data structure:", studentList);
-      setStudents([]);
+      return studentList.results
+        .map((student) => ({
+          id: student.id ? String(student.id).trim() : "",
+          student_id: student.student_id ? String(student.student_id).trim() : "",
+          name: `${student.first_name || ""} ${student.surname || ""}`.trim(),
+          faction: String(
+            student.faction?.name ||
+              student.faction_name ||
+              student.faction ||
+              "N/A",
+          ).trim(),
+          year: String(
+            student.year?.name || student.year_name || student.year || "N/A",
+          ).trim(),
+          room: String(
+            student.room?.name || student.room_name || student.room || "N/A",
+          ).trim(),
+          certificates: student.certificates ? String(student.certificates).trim() : "-",
+          awardLevel: String(
+            student.award_level ||
+              student.awardLevel ||
+              student.current_award ||
+              "N/A",
+          ).trim(),
+          rawData: student,
+        }))
+        .filter((student) => student.id && student.name);
     }
+    return [];
   }, [eligibleStudentsData, filteredStudentsData, selectedYear]);
 
   // Toggle individual student selection
@@ -175,7 +161,7 @@ const CertificateGeneration = () => {
     setSelectedStudents((prev) =>
       prev.includes(studentId)
         ? prev.filter((id) => id !== studentId)
-        : [...prev, studentId]
+        : [...prev, studentId],
     );
   };
 
@@ -196,65 +182,69 @@ const CertificateGeneration = () => {
 
   // Handle Excel download - FIXED VERSION
   const handleDownloadExcel = async () => {
-  if (selectedStudents.length === 0) {
-    messageApi.warning("Please select at least one student to download", 3);
-    return;
-  }
-
-  try {
-    // Get numeric IDs from rawData.id (primary key)
-    const studentIds = selectedStudents
-      .map((studentId) => {
-        const student = students.find((s) => s.id === studentId);
-        return student?.rawData?.id ? Number(student.rawData.id) : null;
-      })
-      .filter((id) => id && !isNaN(id));
-
-    if (studentIds.length === 0) {
-      messageApi.error("No valid student IDs found");
+    if (selectedStudents.length === 0) {
+      messageApi.warning("Please select at least one student to download", 3);
       return;
     }
 
-    console.log("📤 Sending student_ids:", studentIds);
+    try {
+      // Get numeric IDs from rawData.id (primary key)
+      const studentIds = selectedStudents
+        .map((studentId) => {
+          const student = students.find((s) => s.id === studentId);
+          return student?.rawData?.id ? Number(student.rawData.id) : null;
+        })
+        .filter((id) => id && !isNaN(id));
 
-    const blob = await downloadExcel(studentIds).unwrap();
+      if (studentIds.length === 0) {
+        messageApi.error("No valid student IDs found");
+        return;
+      }
 
-    if (!blob || blob.size === 0) {
-      messageApi.error("Received empty file from server");
-      return;
+      console.log("📤 Sending student_ids:", studentIds);
+
+      const blob = await downloadExcel(studentIds).unwrap();
+
+      if (!blob || blob.size === 0) {
+        messageApi.error("Received empty file from server");
+        return;
+      }
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `certificate_students_${new Date().toISOString().split("T")[0]}.xlsx`;
+
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(url), 100); // delay revoke
+
+      messageApi.success("Excel file downloaded successfully", 3);
+    } catch (error) {
+      console.error("❌ Download failed:", error);
+      messageApi.error(
+        error?.data?.message ||
+          error?.data?.detail ||
+          error?.message ||
+          "Failed to download Excel file. Please try again.",
+        4,
+      );
     }
-
-    // Create download link
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `certificate_students_${new Date().toISOString().split("T")[0]}.xlsx`;
-
-    document.body.appendChild(link);
-    link.click();
-
-    // Cleanup
-    document.body.removeChild(link);
-    setTimeout(() => window.URL.revokeObjectURL(url), 100); // delay revoke
-
-    messageApi.success("Excel file downloaded successfully", 3);
-  } catch (error) {
-    console.error("❌ Download failed:", error);
-    messageApi.error(
-      error?.data?.message ||
-      error?.data?.detail ||
-      error?.message ||
-      "Failed to download Excel file. Please try again.",
-      4
-    );
-  }
-};
+  };
 
   // Calculate totals
   const totalEligible = students.length;
 
   // Loading state
-  const isLoading = isLoadingStats || isLoadingStudents || (selectedYear && isLoadingFiltered) || isLoadingYears;
+  const isLoading =
+    isLoadingStats ||
+    isLoadingStudents ||
+    (selectedYear && isLoadingFiltered) ||
+    isLoadingYears;
 
   if (isLoading) {
     return (
@@ -265,19 +255,27 @@ const CertificateGeneration = () => {
   }
 
   // Error state
-  if (isStatsError || isStudentsError || isYearsError || (selectedYear && isFilteredError)) {
+  if (
+    isStatsError ||
+    isStudentsError ||
+    isYearsError ||
+    (selectedYear && isFilteredError)
+  ) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-600 font-semibold mb-2">Failed to load data</p>
           <p className="text-red-500 text-sm">
-            {statsError?.data?.message || studentsError?.data?.message || yearsError?.data?.message || 
-             filteredError?.data?.message || "Please check your connection and try again."}
+            {statsError?.data?.message ||
+              studentsError?.data?.message ||
+              yearsError?.data?.message ||
+              filteredError?.data?.message ||
+              "Please check your connection and try again."}
           </p>
-          <Button 
+          <Button
             onClick={() => {
               refetchStudents();
-            }} 
+            }}
             className="mt-2"
             type="primary"
             danger
@@ -385,6 +383,7 @@ const CertificateGeneration = () => {
               className="w-full sm:w-64 h-11"
               placeholder="Filter by year"
               allowClear
+              disabled={isLoadingYears}
               loading={isLoadingYears}
             >
               <Option value={null}>All Years</Option>
@@ -406,9 +405,16 @@ const CertificateGeneration = () => {
                 height: 44,
                 paddingInline: 24,
                 borderRadius: 8,
-                backgroundColor: selectedStudents.length === 0 ? "rgba(95, 6, 41, 0.5)" : "#5F0629",
-                color: selectedStudents.length === 0 ? "rgba(255, 255, 255, 0.65)" : "#ffffff",
-                cursor: selectedStudents.length === 0 ? "not-allowed" : "pointer",
+                backgroundColor:
+                  selectedStudents.length === 0
+                    ? "rgba(95, 6, 41, 0.5)"
+                    : "#5F0629",
+                color:
+                  selectedStudents.length === 0
+                    ? "rgba(255, 255, 255, 0.65)"
+                    : "#ffffff",
+                cursor:
+                  selectedStudents.length === 0 ? "not-allowed" : "pointer",
                 border: "none",
               }}
             >
@@ -432,7 +438,9 @@ const CertificateGeneration = () => {
                     <div
                       key={student.id}
                       className={`bg-white rounded-lg shadow-md overflow-hidden border-l-4 border-[#5F0629] transition-all ${
-                        isSelected ? "ring-4 ring-[#5F0629] ring-opacity-30" : ""
+                        isSelected
+                          ? "ring-4 ring-[#5F0629] ring-opacity-30"
+                          : ""
                       }`}
                     >
                       <div className="p-4">
@@ -491,7 +499,9 @@ const CertificateGeneration = () => {
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
                             <span className="text-gray-600">Faction:</span>
-                            <span className="font-medium">{student.faction}</span>
+                            <span className="font-medium">
+                              {student.faction}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">Year:</span>
@@ -509,7 +519,9 @@ const CertificateGeneration = () => {
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">Award Level:</span>
-                            <span className="font-medium">{student.awardLevel}</span>
+                            <span className="font-medium">
+                              {student.awardLevel}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -539,7 +551,11 @@ const CertificateGeneration = () => {
               {/* Optional: Select All Button */}
               {students.length > 0 && (
                 <div className="mt-8 text-center">
-                  <Button size="large" onClick={toggleSelectAll} className="px-8">
+                  <Button
+                    size="large"
+                    onClick={toggleSelectAll}
+                    className="px-8"
+                  >
                     {selectedStudents.length === students.length
                       ? "Deselect All"
                       : "Select All"}
@@ -550,8 +566,8 @@ const CertificateGeneration = () => {
           ) : (
             <div className="bg-white rounded-lg shadow-md p-8 text-center">
               <p className="text-gray-500 text-lg">
-                {selectedYear 
-                  ? "No eligible students found for the selected year" 
+                {selectedYear
+                  ? "No eligible students found for the selected year"
                   : "No eligible students found"}
               </p>
             </div>
