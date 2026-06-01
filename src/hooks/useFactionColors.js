@@ -1,6 +1,7 @@
+import { useCallback } from "react";
 
 export const useFactionColors = () => {
-  const getFactionColor = (factionName) => {
+  const getFactionColor = useCallback((factionName) => {
     if (!factionName) return "#5F0629";
 
     let hash = 0;
@@ -12,7 +13,7 @@ export const useFactionColors = () => {
 
     const hue = Math.abs(hash) % 360;
     return `hsl(${hue}, 75%, 55%)`;
-  };
+  }, []);
 
   return { getFactionColor };
 };

@@ -19,6 +19,7 @@ const Report = () => {
   const { data: yearStats = [], isLoading: isYearLoading } = useGetFactionYearWiseStatsQuery(undefined, {
     refetchOnFocus: false,
     refetchOnReconnect: false,
+    skip: activeTab !== "year",
   });
   const [downloadByFaction, { isLoading: isDownloadingFaction }] = useDownloadStudentsByFactionMutation();
   const [downloadByYear, { isLoading: isDownloadingYear }] = useDownloadStudentsByYearMutation();

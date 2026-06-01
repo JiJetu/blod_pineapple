@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Select, Spin, message } from "antd";
-import { ICONS } from "../../assets";
 import { useHeader } from "../../contexts/HeaderContext";
 import { useGetYearsQuery } from "../../redux/features/years/years.api";
 import {
@@ -13,7 +12,6 @@ const { Option } = Select;
 
 const Faction = () => {
   const [selectedYear, setSelectedYear] = useState(null);
-  const [factions, setFactions] = useState([]);
 
   const { setTitle, setDescription } = useHeader();
   const [messageApi, contextHolder] = message.useMessage();
@@ -24,7 +22,9 @@ const Faction = () => {
   const { data: yearsData, isLoading: isLoadingYears } = useGetYearsQuery();
 
   const { data: allFactionsData, isLoading: isLoadingAll } =
-    useGetFactionStatsQuery();
+    useGetFactionStatsQuery(undefined, {
+      skip: !!selectedYear,
+    });
 
   const { data: filteredFactionsData, isLoading: isLoadingFiltered } =
     useGetFactionStatsByYearQuery(selectedYear, {
@@ -37,7 +37,7 @@ const Faction = () => {
   }, [setTitle, setDescription]);
 
   // Process data
-  useEffect(() => {
+  const factions = useMemo(() => {
     let rawData = [];
 
     if (selectedYear && filteredFactionsData) {
@@ -47,8 +47,7 @@ const Faction = () => {
     }
 
     if (!Array.isArray(rawData)) {
-      setFactions([]);
-      return;
+      return [];
     }
 
     const processed = rawData.map((item, index) => {
@@ -68,9 +67,7 @@ const Faction = () => {
     });
 
     // Sort by total award descending
-    processed.sort((a, b) => b.totalAward - a.totalAward);
-
-    setFactions(processed);
+    return processed.sort((a, b) => b.totalAward - a.totalAward);
   }, [allFactionsData, filteredFactionsData, selectedYear, getFactionColor]);
 
   const handleYearChange = (yearId) => {
