@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import { RiFolderDownloadFill, RiEditBoxFill } from "react-icons/ri";
-import { FaFilter, FaTrash } from "react-icons/fa";
+import { FaFilter, FaTrash, FaEye } from "react-icons/fa";
 import { TbTrophyFilled } from "react-icons/tb";
 import { message, Popconfirm, Select, Input } from "antd";
 import { useHeader } from "../../contexts/HeaderContext";
 import AddStudentModal from "../../components/dashboard/AddStudentModal";
 import AddAwardModal from "../../components/dashboard/AddAwardModal";
 import EditStudentModal from "../../components/dashboard/EditStudentModal";
+import StudentDetailsModal from "../../components/dashboard/StudentDetailsModal";
 import {
   useArchiveStudentMutation,
   useDeleteStudentMutation,
@@ -21,7 +22,9 @@ const StudentManagement = () => {
   const { setTitle, setDescription } = useHeader();
   const [isAddAwardOpen, setIsAddAwardOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [detailsStudent, setDetailsStudent] = useState(null);
   const [awardStudent, setAwardStudent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -40,9 +43,10 @@ const StudentManagement = () => {
   const [deleteStudent] = useDeleteStudentMutation();
   const [archiveStudent] = useArchiveStudentMutation();
 
+
   // Filter query
   const filterParams = {
-    student_id: searchTerm || undefined,
+    search: searchTerm || undefined,
     year: selectedYear || undefined,
     faction: selectedFaction || undefined,
   };
@@ -297,6 +301,19 @@ const StudentManagement = () => {
                 <div className="flex gap-4">
                   <div
                     className="relative group"
+                    onClick={() => {
+                      setDetailsStudent(student);
+                      setIsDetailsOpen(true);
+                    }}
+                  >
+                    <FaEye className="text-xl text-primary cursor-pointer" />
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      View Details
+                    </span>
+                  </div>
+
+                  <div
+                    className="relative group"
                     onClick={() => handleArchive(student)}
                   >
                     <RiFolderDownloadFill className="text-xl text-primary cursor-pointer" />
@@ -362,6 +379,15 @@ const StudentManagement = () => {
         onCancel={() => setIsEditOpen(false)}
         onSubmit={handleEditStudent}
         student={selectedStudent}
+      />
+
+      <StudentDetailsModal
+        open={isDetailsOpen}
+        onCancel={() => {
+          setIsDetailsOpen(false);
+          setDetailsStudent(null);
+        }}
+        student={detailsStudent}
       />
     </div>
   );

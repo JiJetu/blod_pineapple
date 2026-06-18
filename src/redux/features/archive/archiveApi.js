@@ -21,9 +21,16 @@ export const archiveApi = baseApi.injectEndpoints({
     }),
 
     // Search archived students
+    // searchArchivedStudents: builder.query({
+    //   query: (searchQuery) => ({
+    //     url: `/archived/students/search/${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ""}`,
+    //     method: "GET",
+    //   }),
+    //   providesTags: ["Archive"],
+    // }),
     searchArchivedStudents: builder.query({
       query: (searchQuery) => ({
-        url: "/archived/students/search/",
+        url: `/archived/students/search/`,
         method: "GET",
         params: {
           q: searchQuery,

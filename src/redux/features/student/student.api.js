@@ -1,6 +1,5 @@
 import { baseApi } from "../../api/base.api";
 
-
 export const studentsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Get all students
@@ -14,11 +13,23 @@ export const studentsApi = baseApi.injectEndpoints({
 
     // Filter students
     filterStudents: builder.query({
-      query: (params) => ({
-        url: "/student/students/filter/",
-        method: "GET",
-        params,
-      }),
+      query: (params) => {
+        const queryParams = [];
+        if (params?.search) {
+          queryParams.push(`search=${params.search}`);
+        }
+        if (params?.year) {
+          queryParams.push(`year=${params.year}`);
+        }
+        if (params?.faction) {
+          queryParams.push(`faction=${params.faction}`);
+        }
+        const queryString = queryParams.join("&");
+        return {
+          url: `/student/students/${queryString ? `?${queryString}` : ""}`,
+          method: "GET",
+        };
+      },
       providesTags: ["Students"],
     }),
 
