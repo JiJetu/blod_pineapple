@@ -30,7 +30,7 @@ const UploadReportModal = ({ open, onCancel }) => {
       return false; // Prevent auto upload
     },
     fileList,
-    accept: ".xls,.xlsx,.xlsm",
+    accept: ".xls,.xlsx,.xlsm,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12,application/vnd.ms-excel.sheet.macroenabled.12",
     maxCount: 1,
     showUploadList: false, // Hide default list - we'll show custom feedback if needed
   };
