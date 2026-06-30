@@ -1,13 +1,23 @@
-import { Form, Select, InputNumber, Input, Button, message, Spin, Image, Typography } from "antd";
+import {
+  Form,
+  Select,
+  InputNumber,
+  Input,
+  Button,
+  message,
+  Spin,
+  Image,
+  Typography,
+} from "antd";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useHeader } from "../../contexts/HeaderContext";
-import { 
-  useAssignAwardMutation, 
-  useGetAwardRulesQuery, 
-  useGetAwardsQuery, 
-  useGetStudentsQuery,
+import {
+  useAssignAwardMutation,
+  useGetAwardRulesQuery,
+  useGetAwardsQuery,
 } from "../../redux/features/award/awards.api";
+import { useGetStudentsQuery } from "../../redux/features/student/student.api";
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -15,34 +25,47 @@ const { Text } = Typography;
 const AwardAssignment = () => {
   const { setTitle, setDescription } = useHeader();
   const [messageApi, contextHolder] = message.useMessage();
-  
-  const { 
-    data: awardRulesData, 
+
+  const {
+    data: awardRulesData,
     isLoading: isLoadingRules,
     isError: isRulesError,
-    error: rulesError 
-  } = useGetAwardRulesQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
-  
-  const { 
-    data: studentsData, 
+    error: rulesError,
+  } = useGetAwardRulesQuery(undefined, {
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
+
+  const {
+    data: studentsData,
     isLoading: isLoadingStudents,
     isError: isStudentsError,
-    error: studentsError 
-  } = useGetStudentsQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
+    error: studentsError,
+  } = useGetStudentsQuery(undefined, {
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
 
   // Add awards query
-  const { 
-    data: awardsData, 
+  const {
+    data: awardsData,
     isLoading: isLoadingAwards,
     isError: isAwardsError,
-    error: awardsError 
-  } = useGetAwardsQuery(undefined, { refetchOnFocus: false, refetchOnReconnect: false });
+    error: awardsError,
+  } = useGetAwardsQuery(undefined, {
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
+  });
 
   const [assignAward, { isLoading: isAssigning }] = useAssignAwardMutation();
 
   const [students, setStudents] = useState([]);
   const [awardRules, setAwardRules] = useState([]);
   const [greeniesAward, setGreeniesAward] = useState(null);
+
+  console.log("studentsData:", studentsData);
+  console.log("students state:", students);
+  console.log("greeniesAward:", greeniesAward);
 
   useEffect(() => {
     setTitle("Award Assignment");
@@ -58,9 +81,8 @@ const AwardAssignment = () => {
   useEffect(() => {
     // Find Greenies award from the awards data
     if (awardsData) {
-      
       let awardList = [];
-      
+
       // Check different possible response structures (similar to students)
       if (Array.isArray(awardsData)) {
         awardList = awardsData;
@@ -71,22 +93,36 @@ const AwardAssignment = () => {
       } else if (awardsData.awards && Array.isArray(awardsData.awards)) {
         awardList = awardsData.awards;
       }
-      
-      // Find the Greenies award by name (case-insensitive)
-      const greenies = awardList.find(award => {
-        const awardName = (award.name || award.award_name || award.awardName || "").toLowerCase();
-        return awardName.includes("green") || awardName.includes("greenies");
+
+      // Find the Greenies / Grinich award by name (case-insensitive)
+      let greenies = awardList.find((award) => {
+        const awardName = (
+          award.name ||
+          award.award_name ||
+          award.awardName ||
+          ""
+        ).toLowerCase();
+        return (
+          awardName.includes("green") ||
+          awardName.includes("greenies") ||
+          awardName.includes("grinich") ||
+          awardName.includes("grin")
+        );
       });
-      
+
+      // Fallback: If not found by name, pick the first base award or first award overall
+      if (!greenies && awardList.length > 0) {
+        greenies = awardList.find(award => award.relative_award === null) || awardList[0];
+      }
+
       setGreeniesAward(greenies || null);
     }
   }, [awardsData]);
 
   useEffect(() => {
     if (studentsData) {
-      
       let studentList = [];
-      
+
       // Check different possible response structures
       if (Array.isArray(studentsData)) {
         studentList = studentsData;
@@ -94,26 +130,46 @@ const AwardAssignment = () => {
         studentList = studentsData.results;
       } else if (studentsData.data && Array.isArray(studentsData.data)) {
         studentList = studentsData.data;
-      } else if (studentsData.students && Array.isArray(studentsData.students)) {
+      } else if (
+        studentsData.students &&
+        Array.isArray(studentsData.students)
+      ) {
         studentList = studentsData.students;
       }
-      
-      
-      // Process and clean the student data
-      const cleanedStudents = studentList.map((student, index) => {
-        // Try different possible property names for ID
-        const id = student.id || student.student_id || student.studentId || student._id || `temp-${index}`;
-        // Try different possible property names for Name
-        const name = student.name || student.full_name || student.student_name || student.username || `Student ${index + 1}`;
-        
-        
-        return {
-          ...student,
-          id: String(id).trim(),
-          name: String(name).trim(),
-        };
-      }).filter(student => student.id && student.name);
-      
+
+      // Process and clean the student data with safe filtering
+      const cleanedStudents = studentList
+        .filter((student) => student && typeof student === "object")
+        .map((student, index) => {
+          // Try different possible property names for ID
+          const id =
+            student.id ||
+            student.student_id ||
+            student.studentId ||
+            student._id ||
+            `temp-${index}`;
+          // Try different possible property names for Name
+          let name =
+            student.name ||
+            student.full_name ||
+            student.student_name ||
+            student.username;
+          if (!name && (student.first_name || student.surname)) {
+            name =
+              `${student.first_name || ""} ${student.surname || ""}`.trim();
+          }
+          if (!name) {
+            name = `Student ${index + 1}`;
+          }
+
+          return {
+            ...student,
+            id: String(id).trim(),
+            name: String(name).trim(),
+          };
+        })
+        .filter((student) => student && student.id && student.name);
+
       setStudents(cleanedStudents);
     }
   }, [studentsData]);
@@ -151,8 +207,9 @@ const AwardAssignment = () => {
       }
 
       // Get the Greenies award ID from the found award
-      const greeniesId = greeniesAward.id || greeniesAward.award_id || greeniesAward._id;
-      
+      const greeniesId =
+        greeniesAward.id || greeniesAward.award_id || greeniesAward._id;
+
       if (!greeniesId) {
         messageApi.error({
           content: "Invalid Greenies award data. Please contact support.",
@@ -170,25 +227,27 @@ const AwardAssignment = () => {
 
       console.log("Submitting award data:", trimmedData);
 
-      const student = students.find(s => s.id === trimmedData.studentId);
-      
+      const student = students.find((s) => s.id === trimmedData.studentId);
+
       await assignAward(trimmedData).unwrap();
-      
+
       messageApi.success({
-        content: `Greenies award assigned successfully to ${student?.first_name || "Student"}!`,
+        content: `Greenies award assigned successfully to ${student?.first_name || student?.name || "Student"}!`,
         duration: 3,
       });
-      
+
       reset({
         studentId: "",
         quantity: 1,
         reason: "",
       });
-      
     } catch (error) {
       console.error("Failed to assign award:", error);
       messageApi.error({
-        content: error?.data?.message || error?.data?.detail || "Failed to assign award. Please try again.",
+        content:
+          error?.data?.message ||
+          error?.data?.detail ||
+          "Failed to assign award. Please try again.",
         duration: 4,
       });
     }
@@ -218,7 +277,10 @@ const AwardAssignment = () => {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-600 font-semibold mb-2">Failed to load data</p>
           <p className="text-red-500 text-sm">
-            {rulesError?.data?.message || studentsError?.data?.message || awardsError?.data?.message || "Please check your connection and try again."}
+            {rulesError?.data?.message ||
+              studentsError?.data?.message ||
+              awardsError?.data?.message ||
+              "Please check your connection and try again."}
           </p>
         </div>
       </div>
@@ -227,39 +289,57 @@ const AwardAssignment = () => {
 
   const renderAwardIcon = (iconUrl, altText) => {
     if (iconUrl) {
-      return <Image src={iconUrl} alt={altText} width={24} height={24} preview={false} />;
+      return (
+        <Image
+          src={iconUrl}
+          alt={altText}
+          width={24}
+          height={24}
+          preview={false}
+        />
+      );
     }
-    
+
     if (altText?.toLowerCase().includes("green")) {
       return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#5F0629">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="#5F0629"
+        >
           <path d="M12.0004 0L14.5039 1.296L17.2909 1.719L18.5539 4.239L20.5594 6.219L20.1004 9L20.5594 11.781L18.5539 13.761L17.2909 16.281L14.5039 16.704L12.0004 18L9.49691 16.704L6.70991 16.281L5.44691 13.761L3.44141 11.781L3.90041 9L3.44141 6.219L5.44691 4.239L6.70991 1.719L9.49691 1.296L12.0004 0Z" />
           <path d="M6 17.6909V23.9999L12 22.4999L18 23.9999V17.6909L14.973 18.1499L12 19.6889L9.027 18.1499L6 17.6909Z" />
         </svg>
       );
     }
-    
+
     return <span className="text-2xl">🏆</span>;
   };
 
   // Get Greenies award name for display
   const getGreeniesName = () => {
     if (!greeniesAward) return "Greenies";
-    
-    return greeniesAward.name || 
-           greeniesAward.award_name || 
-           greeniesAward.awardName || 
-           "Greenies";
+
+    return (
+      greeniesAward.name ||
+      greeniesAward.award_name ||
+      greeniesAward.awardName ||
+      "Greenies"
+    );
   };
 
   // Get Greenies award icon for display
   const getGreeniesIcon = () => {
     if (!greeniesAward) return null;
-    
-    return greeniesAward.icon_url || 
-           greeniesAward.icon || 
-           greeniesAward.iconUrl || 
-           greeniesAward.image_url;
+
+    return (
+      greeniesAward.icon_url ||
+      greeniesAward.icon ||
+      greeniesAward.iconUrl ||
+      greeniesAward.image_url
+    );
   };
 
   return (
@@ -274,31 +354,45 @@ const AwardAssignment = () => {
           {awardRules.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-4">
-                {awardRules.slice(0, Math.ceil(awardRules.length / 2)).map((rule, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      {renderAwardIcon(rule.base_award_icon, rule.base_award_name)}
-                      <span className="text-lg font-medium">{rule.number}</span>
+                {awardRules
+                  .slice(0, Math.ceil(awardRules.length / 2))
+                  .map((rule, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        {renderAwardIcon(
+                          rule.base_award_icon,
+                          rule.base_award_name,
+                        )}
+                        <span className="text-lg font-medium">
+                          {rule.number}
+                        </span>
+                      </div>
+                      <span className="text-lg">
+                        {rule.base_award_name} = 1 {rule.result_award_name}
+                      </span>
                     </div>
-                    <span className="text-lg">
-                      {rule.base_award_name} = 1 {rule.result_award_name}
-                    </span>
-                  </div>
-                ))}
+                  ))}
               </div>
 
               <div className="space-y-4">
-                {awardRules.slice(Math.ceil(awardRules.length / 2)).map((rule, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      {renderAwardIcon(rule.base_award_icon, rule.base_award_name)}
-                      <span className="text-lg font-medium">{rule.number}</span>
+                {awardRules
+                  .slice(Math.ceil(awardRules.length / 2))
+                  .map((rule, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        {renderAwardIcon(
+                          rule.base_award_icon,
+                          rule.base_award_name,
+                        )}
+                        <span className="text-lg font-medium">
+                          {rule.number}
+                        </span>
+                      </div>
+                      <span className="text-lg">
+                        {rule.base_award_name} = 1 {rule.result_award_name}
+                      </span>
                     </div>
-                    <span className="text-lg">
-                      {rule.base_award_name} = 1 {rule.result_award_name}
-                    </span>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           ) : (
@@ -312,45 +406,63 @@ const AwardAssignment = () => {
           <h2 className="text-2xl font-bold text-primary mb-8">Assign Award</h2>
 
           <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-            <Form.Item className="text-base font-medium" label="Select Student" required>
+            <Form.Item
+              className="text-base font-medium"
+              label="Select Student"
+              required
+            >
               <Controller
                 name="studentId"
                 control={control}
-                rules={{ 
+                rules={{
                   required: "Please select a student",
-                  validate: value => value && String(value).trim() ? true : "Please select a student"
+                  validate: (value) =>
+                    value && String(value).trim()
+                      ? true
+                      : "Please select a student",
                 }}
                 render={({ field }) => (
                   <Select
                     {...field}
                     showSearch
-                    placeholder={isLoadingStudents ? "Loading students..." : "Choose a student"}
-                    optionFilterProp="children"
+                    placeholder={
+                      isLoadingStudents
+                        ? "Loading students..."
+                        : "Choose a student"
+                    }
+                    optionFilterProp="label"
                     className="h-11"
                     virtual
-                    disabled={isLoadingStudents || students.length === 0 || !greeniesAward}
-                    filterOption={(input, option) => {
-                      if (!option || !option.children) return false;
-                      const searchText = input.toLowerCase();
-                      const optionText = String(option.children).toLowerCase();
-                      return optionText.includes(searchText);
-                    }}
+                    disabled={
+                      isLoadingStudents ||
+                      students.length === 0 ||
+                      !greeniesAward
+                    }
+                    filterOption={(input, option) =>
+                      (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                    }
                     allowClear
+                    options={students.map((student) => {
+                      const fullName =
+                        `${student.first_name || student.name || ""} ${student.surname || ""}`.trim();
+                      const yearName = student?.year?.name || "N/A";
+                      const studentIdDisplay = student.student_id || student.id;
+                      return {
+                        value: student.id,
+                        label: `${fullName} - ${yearName} (${studentIdDisplay})`,
+                      };
+                    })}
                     notFoundContent={
                       <div className="p-2 text-center">
                         <p>No students found</p>
                         <p className="text-sm text-gray-500">
-                          {studentsData ? `Data received but no students extracted` : "No data received"}
+                          {studentsData
+                            ? `Data received but no students extracted`
+                            : "No data received"}
                         </p>
                       </div>
                     }
-                  >
-                    {students.map((student) => (
-                      <Option key={student.id} value={student.id}>
-                        {student.first_name}{student.surname} - {student?.year?.name} ({student.student_id || student.id})
-                      </Option>
-                    ))}
-                  </Select>
+                  />
                 )}
               />
               {errors.studentId && (
@@ -368,11 +480,11 @@ const AwardAssignment = () => {
               <Form.Item className="text-base font-medium" label="Award type">
                 <div className="flex items-center gap-2 h-11 px-3 border border-gray-300 rounded-lg bg-gray-50">
                   {getGreeniesIcon() ? (
-                    <Image 
-                      src={getGreeniesIcon()} 
-                      alt={getGreeniesName()} 
-                      width={18} 
-                      height={18} 
+                    <Image
+                      src={getGreeniesIcon()}
+                      alt={getGreeniesName()}
+                      width={18}
+                      height={18}
                       preview={false}
                     />
                   ) : (
@@ -397,19 +509,25 @@ const AwardAssignment = () => {
                   </p>
                 ) : (
                   <p className="text-sm text-gray-500 mt-1">
-                    Only {getGreeniesName()} can be assigned directly. Other awards are earned through conversion.
+                    Only {getGreeniesName()} can be assigned directly. Other
+                    awards are earned through conversion.
                   </p>
                 )}
               </Form.Item>
 
-              <Form.Item className="text-base font-medium" label="Quantity" required>
+              <Form.Item
+                className="text-base font-medium"
+                label="Quantity"
+                required
+              >
                 <Controller
                   name="quantity"
                   control={control}
                   rules={{
                     required: "Quantity is required",
                     min: { value: 1, message: "Minimum 1" },
-                    validate: value => value > 0 ? true : "Quantity must be greater than 0"
+                    validate: (value) =>
+                      value > 0 ? true : "Quantity must be greater than 0",
                   }}
                   render={({ field }) => (
                     <InputNumber
@@ -430,7 +548,10 @@ const AwardAssignment = () => {
               </Form.Item>
             </div>
 
-            <Form.Item className="text-base font-medium" label="Reason of the award">
+            <Form.Item
+              className="text-base font-medium"
+              label="Reason of the award"
+            >
               <Controller
                 name="reason"
                 control={control}
@@ -462,7 +583,9 @@ const AwardAssignment = () => {
                 className="px-8 py-2 h-11 rounded-lg"
                 style={{ background: "#5F0629" }}
                 loading={isAssigning}
-                disabled={isAssigning || students.length === 0 || !greeniesAward}
+                disabled={
+                  isAssigning || students.length === 0 || !greeniesAward
+                }
               >
                 {isAssigning ? "Assigning..." : `Assign ${getGreeniesName()}`}
               </Button>

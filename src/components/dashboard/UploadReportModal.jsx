@@ -13,15 +13,16 @@ const UploadReportModal = ({ open, onCancel }) => {
       setFileList([]);
     },
     beforeUpload: (file) => {
+      const fileName = file.name || "";
       const isExcel =
         file.type ===
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
         file.type === "application/vnd.ms-excel" ||
-        file.name.endsWith(".xls") ||
-        file.name.endsWith(".xlsx");
+        file.type === "application/vnd.ms-excel.sheet.macroEnabled.12" ||
+        /\.(xlsx|xls|xlsm)$/i.test(fileName);
 
       if (!isExcel) {
-        message.error("You can only upload Excel files (.xls, .xlsx)!");
+        message.error("You can only upload Excel files (.xls, .xlsx, .xlsm)!");
         return Upload.LIST_IGNORE;
       }
 
@@ -29,7 +30,7 @@ const UploadReportModal = ({ open, onCancel }) => {
       return false; // Prevent auto upload
     },
     fileList,
-    accept: ".xls,.xlsx",
+    accept: ".xls,.xlsx,.xlsm",
     maxCount: 1,
     showUploadList: false, // Hide default list - we'll show custom feedback if needed
   };
